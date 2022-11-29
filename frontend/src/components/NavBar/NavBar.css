@@ -1,0 +1,24 @@
+.Nav-Bar {
+  background-color: grey;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 38.5px;
+  
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+
+.Nav-Bar-Item, .Nav-Bar > p{
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+}
+
+.Nav-Bar > p {
+  background-color: rgb(164, 162, 162);
+}

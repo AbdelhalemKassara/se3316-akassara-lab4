@@ -1,6 +1,9 @@
 p {
   margin: 0px;
   padding: 0px;
+
+  word-break: anywhere;
+  white-space: normal;
 }
 
 input {
