@@ -1,0 +1,98 @@
+CREATE DATABASE Music_Data;
+USE Music_Data;
+
+CREATE TABLE artist (
+id INT NOT NULL AUTO_INCREMENT,
+activeYearStart INT,
+activeYearEnd INT,
+contact VARCHAR(300),
+dateCreated DATETIME(2),
+handle VARCHAR(300),
+location VARCHAR(500),
+artistName VARCHAR(300),
+relatedProjects VARCHAR(1500),
+PRIMARY KEY (id)
+);
+
+CREATE TABLE artistMembers (
+id INT NOT NULL AUTO_INCREMENT,
+artistID INT NOT NULL,
+member VARCHAR(300) NOT NULL,
+PRIMARY KEY (id),
+FOREIGN KEY (artistID) REFERENCES artist(id) ON UPDATE CASCADE);
+
+CREATE TABLE artistTags (
+id INT NOT NULL AUTO_INCREMENT,
+artistID INT NOT NULL,
+tag VARCHAR(300),
+FOREIGN KEY (artistID) REFERENCES artist(id) ON UPDATE CASCADE,
+PRIMARY KEY (id));
+
+CREATE TABLE album (
+id INT NOT NULL AUTO_INCREMENT,
+dateCreated DATETIME(2),
+dateReleased DATE,
+handle VARCHAR(300),
+producer VARCHAR(300),
+title VARCHAR(300),
+numTracks INT,
+type VARCHAR(300),
+artistName VARCHAR(300),
+PRIMARY KEY(id));
+
+CREATE TABLE albumTags (
+id INT NOT NULL AUTO_INCREMENT,
+albumID INT NOT NULL,
+tag VARCHAR(300),
+PRIMARY KEY(id),
+FOREIGN KEY (albumID) REFERENCES album(id) ON UPDATE CASCADE);
+
+CREATE TABLE genre(
+id INT NOT NULL AUTO_INCREMENT,
+numTracks INT,
+parentID INT,
+title VARCHAR(100),
+topLevelID INT,
+PRIMARY KEY (id));
+
+CREATE TABLE track (
+id INT NOT NULL AUTO_INCREMENT,
+albumID INT NOT NULL,
+artistID INT NOT NULL,
+licenseTitle VARCHAR(300),
+bitRate INT,
+composer VARCHAR(300),
+copyrightC VARCHAR(300),
+copyrightP VARCHAR(300),
+dateCreated DATETIME(2),
+dateRecorded DATE,
+discNumber INT,
+duration TIME,
+explicit VARCHAR(50),
+languageCode VARCHAR(10),
+number INT,
+publisher VARCHAR(100),
+title VARCHAR(300),
+PRIMARY KEY (id),
+FOREIGN KEY (albumID) REFERENCES album(id) ON UPDATE CASCADE,
+FOREIGN KEY (artistID) REFERENCES artist(id) ON UPDATE CASCADE);
+
+CREATE TABLE trackGenres (
+id INT NOT NULL AUTO_INCREMENT,
+trackID INT NOT NULL,
+genreTitle VARCHAR(300) NOT NULL,
+PRIMARY KEY (id),
+FOREIGN KEY (trackID) REFERENCES track(id) ON UPDATE CASCADE);
+
+CREATE TABLE trackTags (
+id INT NOT NULL AUTO_INCREMENT,
+trackID INT NOT NULL,
+tag VARCHAR(300) NOT NULL,
+PRIMARY KEY(id),
+FOREIGN KEY (trackID) REFERENCES track(id) ON UPDATE CASCADE);
+
+CREATE TABLE user ();
+
+CREATE TABLE playlist();
+CREATE TABLE playlistTrack();
+CREATE TABLE playlistReview();
