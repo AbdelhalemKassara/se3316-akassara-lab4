@@ -1,25 +1,9 @@
 import React, { useRef } from 'react'
-import { useAuth } from '../AuthContext';
 
 export default function SignUp() {
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const passwordConfirmRef = useRef();
-  const { signup } = useAuth();
-
-  const signUpWithGoogle = () => {
-
-  };
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    if(passwordRef)
-    signup(emailRef.current.value, passwordRef.current.value);
-  }
   return (
   <div id="Authentication"> 
-        <button id="signUpWithGoogle" onClick={signUpWithGoogle}>Continue With Google</button>
+        <button id="signUpWithGoogle">Continue With Google</button>
       <p>or</p>
 
     <div className="AuthenticationInput">
