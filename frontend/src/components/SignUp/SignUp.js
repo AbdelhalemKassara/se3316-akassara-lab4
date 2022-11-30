@@ -16,7 +16,7 @@ export default function SignUp() {
     //check if there is an existing user
     if(true) {
       //add user
-      let result = await fetch('http://localhost:3001/api/something/createAccount', {
+      let result = await fetch('/api/something/createAccount', {
         method : 'POST',
         headers : {
           'Content-Type': 'application/json'
