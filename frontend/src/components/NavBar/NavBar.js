@@ -13,7 +13,7 @@ export default function NavBar() {
       <Link to="/Genres" className="Nav-Bar-Item" id="Genres">Genres</Link>
       <Link to="/Playlists" className="Nav-Bar-Item" id="Playlists">Playlists</Link>
       <Link to="/Search" className="Nav-Bar-Item" id="Search">Search</Link>
-      <Link to='account/login' className="Nav-Bar-Item" id="User">User</Link>
+      <Link to='/account/login' className="Nav-Bar-Item" id="User">User</Link>
     </div>
   );
 }

@@ -6,7 +6,7 @@ export default function SignUp() {
   const password = useRef('');
   const confirmPassword = useRef('');
 
-  function createUser() {
+  async function createUser() {
 
     if(password.current.value == '') {alert("Password is blank"); return;}
     if(password.current.value != confirmPassword.current.value) {alert("passwords don't match"); return;}
@@ -16,7 +16,19 @@ export default function SignUp() {
     //check if there is an existing user
     if(true) {
       //add user
-      console.log(window.location.host);
+      let result = await fetch('http://localhost:3001/api/something/createAccount', {
+        method : 'POST',
+        headers : {
+          'Content-Type': 'application/json'
+        },
+        body : JSON.stringify({
+          email : email.current.value,
+          userName : username.current.value,
+          password : password.current.value
+        })
+      })
+
+      console.log(result);
     }
 
     

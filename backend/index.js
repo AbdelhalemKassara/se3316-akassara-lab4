@@ -28,6 +28,8 @@ app.use('/', express.static('../frontend/build'));
 router.use(express.json());
 user.use(authenticateToken);
 
+
+
 user.get('/getUserOnlyStuff', async (req, res) => {
   let user = await query("SELECT id FROM user WHERE email='"+req.user.email+"';");
 
