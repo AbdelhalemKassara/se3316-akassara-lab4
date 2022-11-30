@@ -6,7 +6,7 @@ let con = mysql.createConnection(credentials);
 con.connect(async function(err) {
   if(err) throw err;
   console.log("SQL Database Connected");
-  await addGenres();
+  // await addGenres();
   //await query("SELECT * FROM genre;");
   //await addAlbums();
   // await addAlbumTags();
@@ -14,7 +14,6 @@ con.connect(async function(err) {
   // await addArtistMembers();
   // await addArtistTags();  
   //  await addTracks();
-  // await addTrackGenres();
   // await addTrackGenres();
   // await addTrackTags();
   endConnection();
@@ -117,12 +116,12 @@ async function addTracks() {
     val["track_copyright_c"], val["track_copyright_p"], convertDate(val["track_date_created"]),
     convertDate(val["track_date_recorded"]), val["track_disc_number"], convertTime(val["track_duration"]), 
     val["track_explicit"], val["track_language_code"], val["track_number"], val["track_publisher"],
-    val["track_title"]
+    val["track_title"], val["artist_name"], val["album_title"]
     ].map(val => ifValEmpty(val));//if the value is an empty string return null;
   });
 
-  //console.log(values);
-const queryString = "INSERT INTO track (id, albumID, artistID, licenseTitle, bitRate, composer, copyrightC, copyrightP, dateCreated, dateRecorded, discNumber, duration, explicit, languageCode, number, publisher, title) VALUES ?";  
+  console.log(values);
+  const queryString = "INSERT INTO track (id, albumID, artistID, licenseTitle, bitRate, composer, copyrightC, copyrightP, dateCreated, dateRecorded, discNumber, duration, explicit, languageCode, number, publisher, title, artistName, albumName) VALUES ?";  
   return await query(queryString, values);
 }
 

@@ -76,7 +76,8 @@ publisher VARCHAR(100),
 title VARCHAR(300),
 PRIMARY KEY (id));
 
-DROP TABLE trackGenres;
+ALTER TABLE track ADD COLUMN artistName VARCHAR(300);
+ALTER TABLE track ADD COLUMN albumName VARCHAR(300);
 
 CREATE TABLE trackGenres (
 trackID INT NOT NULL,
@@ -109,7 +110,6 @@ publicVisibility BOOLEAN NOT NULL,
 description VARCHAR(1000),
 PRIMARY KEY (id),
 FOREIGN KEY (userID) REFERENCES user(id) ON UPDATE CASCADE);
-
 
 CREATE TABLE playlistTrack(
 playlistID INT NOT NULL AUTO_INCREMENT,
