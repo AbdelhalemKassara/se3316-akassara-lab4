@@ -33,15 +33,11 @@ function UTCtoSQLDate(val) {
   return moment(new Date(0).setUTCSeconds(val)).format('YYYY-MM-DD HH:mm:ss');
 }
 
-function padZeros(val, length = 2) {
-  val = String(val);
-  let out = val;
-
-  for(let i = 0; i < (length - val.length); i++) {
-      out = "0" + out;
-  }
+function CurSQLDate() {
+  return moment().format('YYYY-MM-DD HH:mm:ss');
 }
 
 exports.UTCtoSQLDate = UTCtoSQLDate;
 exports.query = query;
 exports.startDatabaseConnection = startDatabaseConnection;
+exports.CurSQLDate = CurSQLDate;

@@ -39,7 +39,7 @@ user.post('/login', async (req, res) => {
       const passUser = {id : user[0].id, email : user[0].email, userName : user[0].userName};
 
       const accessToken = generateAccessToken(passUser);
-      const refreshToken = jwt.sign(passUser, process.env.REFRESH_TOKEN_SECRET, {expiresIn : '1min', jwtid: crypto.randomBytes(16).toString('hex')});
+      const refreshToken = jwt.sign(passUser, process.env.REFRESH_TOKEN_SECRET, {expiresIn : '24h', jwtid: crypto.randomBytes(16).toString('hex')});
 
       res.json({accessToken : accessToken, refreshToken : refreshToken});
 
@@ -97,9 +97,9 @@ function startAuthenticationServer() {
     console.log("Authentication Server: Listening on port ", port);
   });
 }
-startAuthenticationServer();
+exports.startAuthenticationServer = startAuthenticationServer;
 
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn : '30s'})//set to 10-15 or 30min
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn : '15min'})//set to 10-15 or 30min
 }
 

@@ -1,8 +1,9 @@
-const bcrypt = require('bcrypt');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const {query, startDatabaseConnection} = require('./databaseConnection');
+
+const {query, startDatabaseConnection, UTCtoSQLDate, CurSQLDate} = require('./databaseConnection');
+const {startAuthenticationServer} = require('./autenticationServer');
 
 const app = express();
 const port = 3001;
@@ -23,11 +24,24 @@ app.use(function (req, res, next) {
   */
 
 router.use(express.json());
+user.use(authenticateToken);
 
-user.get('/getUserOnlyStuff', authenticateToken, async (req, res) => {
+user.get('/getUserOnlyStuff', async (req, res) => {
   let user = await query("SELECT id FROM user WHERE email='"+req.user.email+"';");
 
   res.json({message : "This should only be seen by a logged in user, here is your id.", id : user[0]["id"]});
+});
+
+user.get('/playlists', async (req, res) => {
+
+  res.json(await query("SELECT * FROM playlist WHERE userID='" + req.user.id + "';"));
+});
+
+user.post('/createPlaylist', async(req, res) => {
+
+  let result = await query("INSERT INTO playlist (name, userID, dateLastChanged, publicVisibility) VALUES ?", [[req.body.name, req.user.id, CurSQLDate(), false]]);
+  console.log(result);
+  res.sendStatus(201);
 });
 
 //*Get (retrieve)
@@ -69,13 +83,15 @@ playlists.delete('/removeList/:id', (req, res) => {
 app.use('/api', router);
 app.use('/api/playlists', playlists);
 app.use('/api/search', search);
-app.use('/api/Account', user);
+app.use('/api/account', user);
 
 
 startDatabaseConnection().then(() => {
+  startAuthenticationServer();
   app.listen(port, () => {
     console.log("Main Server: Listening on port ", port);
   });
+  
 })
 
 function authenticateToken(req, res, next) {
