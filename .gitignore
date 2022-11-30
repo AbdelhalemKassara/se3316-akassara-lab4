@@ -7,6 +7,9 @@ serverCredentials.json
 #ignore files containing data that will be added to the database
 DatabaseData
 
+#ignore files for testing the backend
+*.rest
+
 # Logs
 logs
 *.log

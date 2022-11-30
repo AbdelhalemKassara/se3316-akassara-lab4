@@ -6,7 +6,7 @@ let con = mysql.createConnection(credentials);
 con.connect(async function(err) {
   if(err) throw err;
   console.log("SQL Database Connected");
-  //await addGenres();
+  await addGenres();
   //await query("SELECT * FROM genre;");
   //await addAlbums();
   // await addAlbumTags();
