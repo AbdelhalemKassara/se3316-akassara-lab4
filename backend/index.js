@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const {query, startDatabaseConnection, UTCtoSQLDate, CurSQLDate} = require('./databaseConnection');
-const {startAuthenticationServer} = require('./autenticationServer');
-
+const {addAuthentication} = require('./autenticationServer');
 const app = express();
 const port = 3001;
 
@@ -12,6 +11,7 @@ const router = express.Router();
 const playlists = express.Router();
 const search = express.Router();
 const user = express.Router();
+const tempUser = express.Router();
 
 //Set up serving the front end code
 /*app.use('/', express.static('frontEnd'));
@@ -79,15 +79,17 @@ playlists.put('/newList/:id', (req, res) => {
 playlists.delete('/removeList/:id', (req, res) => {
 });
 
+//Authentication///////////////////////////////////////////
+addAuthentication(tempUser);
 
+//Authentcation end////////////////////////////////
 app.use('/api', router);
 app.use('/api/playlists', playlists);
 app.use('/api/search', search);
 app.use('/api/account', user);
-
+app.use('/api/something', tempUser);
 
 startDatabaseConnection().then(() => {
-  startAuthenticationServer();
   app.listen(port, () => {
     console.log("Main Server: Listening on port ", port);
   });
