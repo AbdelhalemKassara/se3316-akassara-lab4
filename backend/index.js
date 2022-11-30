@@ -6,7 +6,7 @@ const path = require('path');
 const {query, startDatabaseConnection, UTCtoSQLDate, CurSQLDate} = require('./databaseConnection');
 const {addAuthentication} = require('./autenticationServer');
 const app = express();
-const port = 3001;
+const port = 3000;
 
 const router = express.Router();
 const playlists = express.Router();
