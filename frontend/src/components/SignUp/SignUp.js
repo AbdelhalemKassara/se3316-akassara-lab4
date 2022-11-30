@@ -27,7 +27,7 @@ export default function SignUp() {
           password : password.current.value
         })
       })
-
+      alert('Account has been created')
       console.log(result);
     }
 
