@@ -23,8 +23,9 @@ function addAuthentication(userCred) {
 
       let createdUser = await query("SELECT * FROM user WHERE email='" + user.email + "';");
       if(createdUser.error !== undefined) return res.status(500).send();
-      
-      res.status(201).send(req.protocol + "://" + req.get('host') + '/api/account/verification/' + await generateAccountVerificationToken(createdUser.result[0]));
+
+      res.status(201).json({verificationLink : req.protocol + "://" + req.get('host') + '/api/account/verification/' + await generateAccountVerificationToken(createdUser.result[0])});
+
     } catch {
       res.status(500).send();
     }
@@ -63,7 +64,7 @@ function addAuthentication(userCred) {
       if(await bcrypt.compare(req.body.password, user.password)) {
         //check if the user is disabled or if they haven't verified their email yet
         if(user.disabled) return res.status(403).send("User is currently disabled");
-        if(!user.verifiedEmail) return res.status(403).send(req.protocol + "://" + req.get('host') + '/api/account/verification/' + await generateAccountVerificationToken(user));
+        if(!user.verifiedEmail) return res.status(403).json({verificationLink : req.protocol + "://" + req.get('host') + '/api/account/verification/' + await generateAccountVerificationToken(user)});
         
         //the user exists
         const passUser = {id : user.id, email : user.email, userName : user.userName};

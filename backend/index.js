@@ -1,10 +1,12 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const path = require('path');
 
-const {query, startDatabaseConnection, UTCtoSQLDate, CurSQLDate} = require('./databaseConnection');
+const {startDatabaseConnection} = require('./databaseConnection');
 const {addAuthentication} = require('./autenticationServer');
+const {addLoggedInRoutes} = require('./loggedInServer');
+const {addPublicRoutes} = require('./publicServer');
+
 const app = express();
 const port = 3000;
 
@@ -28,65 +30,15 @@ app.use('/', express.static('../frontend/build'));
 router.use(express.json());
 user.use(authenticateToken);
 
+//add routes for users that are logged in
+addLoggedInRoutes(user);
 
+//add public routes
+addPublicRoutes(playlists, search, router);
 
-user.get('/getUserOnlyStuff', async (req, res) => {
-  let user = await query("SELECT id FROM user WHERE email='"+req.user.email+"';");
-
-  res.json({message : "This should only be seen by a logged in user, here is your id.", id : user.result[0]["id"]});
-});
-
-user.get('/playlists', async (req, res) => {
-
-  res.json(await query("SELECT * FROM playlist WHERE userID='" + req.user.id + "';"));
-});
-
-user.post('/createPlaylist', async(req, res) => {
-
-  let result = await query("INSERT INTO playlist (name, userID, dateLastChanged, publicVisibility) VALUES ?", [[req.body.name, req.user.id, CurSQLDate(), false]]);
-  console.log(result);
-  res.sendStatus(201);
-});
-
-//*Get (retrieve)
-router.get('/genres',(req, res) => {
-});
-//sends information about all the playlists
-router.get('/playlists', (req, res) => {
-});
-//given a track id it will return a track or error message
-router.get('/track/:id', (req, res) => {
-});
-router.get('/artist/:id', (req, res) => {
-});
-router.get('/album/:id', (req, res) => {
-});
-//given a name it will return a list of tracks and albums ids that match or an error message
-search.get('/track/:name', (req, res) => {
-});
-//given an artist name it will return a list of artists ids or an error message
-search.get('/artist/:name', (req, res) => {
-});
-//given a playlist id it will return the tracks contained within it or an error message
-playlists.get('/tracks/:id', (req, res) => {
-});
-
-//given a playlist id and set of tracks it will replace the tracks with the new ones or return an error message
-playlists.put('/updateList/:id', (req, res) => {
-});
-
-//given a playlist id it will create a new playlist or return an error message
-playlists.put('/newList/:id', (req, res) => {
-});
-
-//*Delete (delete)
-playlists.delete('/removeList/:id', (req, res) => {
-});
-
-//Authentication///////////////////////////////////////////
+//add routes for authentication
 addAuthentication(userCred);
 
-//Authentcation end////////////////////////////////
 app.use('/api', router);
 app.use('/api/playlists', playlists);
 app.use('/api/search', search);

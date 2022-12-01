@@ -16,7 +16,7 @@ export default function SignUp() {
     //check if there is an existing user
     if(true) {
       //add user
-      let result = await fetch('/api/something/createAccount', {
+      let result = await fetch('/api/account/createAccount', {
         method : 'POST',
         headers : {
           'Content-Type': 'application/json'
@@ -27,8 +27,13 @@ export default function SignUp() {
           password : password.current.value
         })
       })
-      alert('Account has been created')
-      console.log(result);
+
+      if(result.ok) {
+        result = await result.json();
+        if(window.confirm('this will take you to verify your account.')) {
+          window.location.href = result.verificationLink;
+        }
+      }
     }
 
     
