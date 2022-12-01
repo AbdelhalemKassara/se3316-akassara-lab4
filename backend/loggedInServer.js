@@ -1,4 +1,5 @@
 const {query, startDatabaseConnection, UTCtoSQLDate, CurSQLDate} = require('./databaseConnection');
+const bcrypt = require('bcrypt');
 
 function addLoggedInRoutes(user) {
   user.get('/getUserOnlyStuff', async (req, res) => {
@@ -26,6 +27,35 @@ function addLoggedInRoutes(user) {
 
     return res.sendStatus(201);
   });
+  
+  //this updates the user's password
+  user.put('/changepassword',checkPasswordFormat, async (req, res) => {
+    //update password
+    try {
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      
+      let result = await query("UPDATE user SET password='"+ hashedPassword + "' WHERE id=" + req.user.id + ";")
+      if(result.error !== undefined) {console.log(result.error); return res.status(500).send()};
+
+      return res.sendStatus(204);
+    } catch (e){
+      console.log(e);
+      return res.sendStatus(500);
+    }
+  });
 }
 
 exports.addLoggedInRoutes = addLoggedInRoutes;
+
+
+function checkPasswordFormat(req, res, next) {
+  let user = req.body;
+
+  if(user === undefined) return res.status(400).json({error : "There are no email and password values"});
+  if(user.password === undefined) return res.status(400).json({error : "there is no password field"});
+  if(typeof user.password !== 'string' && !(user.password instanceof String)) return res.status(400).json({error : "Please enter a string for the email"});
+  if(user.password === '') return res.status(400).json({error : "There is no password value"});
+  if(user.password.length > 72) return res.status(400).json({error : "max character length for the password is 72 characters"});
+
+  next();
+}

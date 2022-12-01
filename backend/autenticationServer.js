@@ -75,7 +75,7 @@ function addAuthentication(userCred) {
         res.json({accessToken : accessToken, refreshToken : refreshToken});
 
       } else {
-        res.status(401).send('The password is incorrect');//the password is invalid
+        res.status(401).json({error : 'The password is incorrect'});//the password is invalid
       }
     } catch{
       res.status(500).send();
@@ -138,7 +138,7 @@ exports.addAuthentication = addAuthentication;
 
 function checkLoginFormat(req, res, next) {
   let user = req.body;
-  console.log(user);
+
   if(user === undefined) return res.status(400).json({error : "There are no email and password values"});
   if(user.password === undefined) return res.status(400).json({error : "there is no password field"});
   if(user.email === undefined) return res.status(400).json({error : "There is no email field"});
