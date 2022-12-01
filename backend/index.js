@@ -33,7 +33,7 @@ user.use(authenticateToken);
 user.get('/getUserOnlyStuff', async (req, res) => {
   let user = await query("SELECT id FROM user WHERE email='"+req.user.email+"';");
 
-  res.json({message : "This should only be seen by a logged in user, here is your id.", id : user[0]["id"]});
+  res.json({message : "This should only be seen by a logged in user, here is your id.", id : user.result[0]["id"]});
 });
 
 user.get('/playlists', async (req, res) => {

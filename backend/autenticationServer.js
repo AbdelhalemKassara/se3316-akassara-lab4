@@ -81,64 +81,59 @@ function addAuthentication(userCred) {
     }
   });
 
-  userCred.delete('/logout', (req, res) => {
-    //take in both the current accesstoken and current refresh token
-    //if the are expired or are already in the database return a message saying that the user already has logged out
-    
-    let refreshToken = req.body.token;
-    if(refreshToken == null) {
-      return res.sendStatus(401);//not token has been passed
-    }
-
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
-      if(err) return res.sendStatus(403); 
-      
-      res.sendStatus(204);
+  //this logs out a user account
+  userCred.delete('/logout', async (req, res) => {
+    //take in refresh token
+    const authHeader = req.headers['authorization'];
+    const refreshToken = authHeader && authHeader.split(' ')[1];//undefined or token
   
-      await query("INSERT INTO expiredJWT (jti) VALUES ('" + user.jti + "');");
-      await query("CREATE EVENT delete_token ON SCHEDULE AT '" + UTCtoSQLDate(user.exp) + "' DO DELETE FROM expiredJWT WHERE jti='" + user.jti + "';");
-    });
+    if(refreshToken === null || refreshToken === undefined || refreshToken === '') return res.sendStatus(401);//if there is no token passed in
 
+    //add refresh token id to expiredJWT table
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
+      if(err) return res.sendStatus(403);//if the token has already expired or invalid
+      
+      //check if the tokens have already been added to the database
+      let result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ user.jti + "') AS bool;");
+      if(result.error !== undefined) return res.status(500).send(); 
+      if(result.result[0].bool == 1) return res.sendStatus(403)//if the token was already "logged out"
+
+      //add the token to the expired tokens table
+      result = await query("INSERT INTO expiredJWT (jti) VALUES ('" + user.jti + "');");
+      if(result.error !== undefined) return res.status(500).send(); 
+      result = await query("CREATE EVENT delete_token ON SCHEDULE AT '" + UTCtoSQLDate(user.exp) + "' DO DELETE FROM expiredJWT WHERE jti='" + user.jti + "';");
+      if(result.error !== undefined) return res.status(500).send(); 
+
+      return res.sendStatus(204);
+    });    
   })
 
-  userCred.post('/token/access', (req, res) => {
-    //takes in a refresh token
-    //checks if the refresh token is valid
-    //check if the token is expired
+  //this gets a new access token
+  userCred.post('/accesstoken', (req, res) => {
+    //check if the refresh token has been expired
+
     //create new access token
 
-    const refreshToken = req.body.token;
-    if(refreshToken == null) return res.sendStatus(401);//if there is no token passed in
+    const authHeader = req.headers['authorization'];
+    const refreshToken = authHeader && authHeader.split(' ')[1];//undefined or token
+
+    if(refreshToken === null || refreshToken === undefined || refreshToken === '') return res.sendStatus(401);//if there is no token passed in
     
 
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
       if(err) return res.sendStatus(403);
 
       let result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ user.jti + "') AS bool;");
-      if(result[0].bool == 1) return res.sendStatus(403)//check if we have the token
+      if(result.result[0].bool == 1) return res.sendStatus(403)//check if we have the token
     
-      const accessToken = generateAccessToken({id : user.id, email : user.email, userName : user.userName});//get an access token
-      res.json({accessToken : accessToken});
+      const accessToken = await generateAccessToken({id : user.id, email : user.email, userName : user.userName});//get an access token
+      return res.json({accessToken : accessToken});
     })
   })
-  userCred.post('/token/refresh', (req, res) => {
-    //takes in refresh token
-    //checks if the refresh token is valid
-    //check if the refresh token is expired
-    //check if the refreh token is going to expire within an hour
-    //create a new refresh token
-    
-  });  
 }
 
 
 exports.addAuthentication = addAuthentication;
-
-async function checkIfUserExists(req, res, next) {
-  //let result = await query();
-
-
-}
 
 function checkLoginFormat(req, res, next) {
   let user = req.body;
