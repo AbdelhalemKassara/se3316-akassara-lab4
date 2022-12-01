@@ -12,7 +12,7 @@ const router = express.Router();
 const playlists = express.Router();
 const search = express.Router();
 const user = express.Router();
-const tempUser = express.Router();
+const userCred = express.Router();
 
 //Set up serving the front end code
 app.use('/', express.static('../frontend/build'));
@@ -84,16 +84,16 @@ playlists.delete('/removeList/:id', (req, res) => {
 });
 
 //Authentication///////////////////////////////////////////
-addAuthentication(tempUser);
+addAuthentication(userCred);
 
 //Authentcation end////////////////////////////////
 app.use('/api', router);
 app.use('/api/playlists', playlists);
 app.use('/api/search', search);
-app.use('/api/account', user);
-app.use('/api/something', tempUser);
+app.use('/api/account/loggedin', user);
+app.use('/api/account', userCred);
 
-startDatabaseConnection().then(() => {
+startDatabaseConnection().then(async () => {
   app.listen(port, () => {
     console.log("Main Server: Listening on port ", port);
   });

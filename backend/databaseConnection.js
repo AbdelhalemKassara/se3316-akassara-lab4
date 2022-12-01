@@ -4,7 +4,7 @@ const moment = require('moment');
 let con = mysql.createConnection(credentials);
 
 
-//check if I will need to deal with the catch statement at the end in the rest of the code
+//returns either an error object or an result object
 async function query(sqlCommand, data) {
   let params = [sqlCommand];
   if(data !== undefined) params.push([data]);
@@ -12,9 +12,11 @@ async function query(sqlCommand, data) {
   return await new Promise((resolve, reject) => {
     con.query(...params, function(err, result) {
       if(err) return reject(err);
-      resolve(result);
+      resolve({result : result});
     });
-  }).catch(e => console.log(e));
+  }).catch(e => {
+    return {error : e};
+  });
 }
 
 //connecting to database and starting server
@@ -27,6 +29,7 @@ function startDatabaseConnection() {
     })
   }).catch((err) => {
     console.log(err);
+    return err;
   });
 }
 function UTCtoSQLDate(val) {
