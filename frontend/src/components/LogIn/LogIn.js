@@ -1,24 +1,25 @@
 import './LogIn.css';
 import { Link } from 'react-router-dom';
+import { useRef } from 'react';
 
-export default function LogIn() {
+export default function LogIn(props) {
+  const email = useRef('');
+  const password = useRef('');
 
   return (
     <div id="Authentication"> 
-      <button id="loginGoogle">Login With Google</button>
-      <p>or</p>
       <div className="AuthenticationInput">
         <div>
           <p>Email address</p>
-          <input type="text" placeholder="email" id="loginEmail"/>
+          <input type="text" placeholder="email" id="loginEmail" ref={email}/>
         </div>
         <div>
           <p>Password</p>
-          <input type="password" placeholder="password" id="loginPassword"/>
+          <input type="password" placeholder="password" id="loginPassword" ref={password}/>
         </div>
       </div>
       <p>Forgot Password</p>
-      <button id="login">Login</button>
+      <button id="login" onClick={() => props.onLogin(email.current.value, password.current.value)}>Login</button>
       <Link to="/account/signup">Create Account</Link>
     </div>);
 }

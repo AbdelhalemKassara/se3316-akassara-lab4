@@ -96,14 +96,14 @@ function addAuthentication(userCred) {
       
       //check if the tokens have already been added to the database
       let result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ user.jti + "') AS bool;");
-      if(result.error !== undefined) return res.status(500).send(); 
+      if(result.error !== undefined) return res.status(500).send();
       if(result.result[0].bool == 1) return res.sendStatus(403)//if the token was already "logged out"
 
       //add the token to the expired tokens table
       result = await query("INSERT INTO expiredJWT (jti) VALUES ('" + user.jti + "');");
-      if(result.error !== undefined) return res.status(500).send(); 
-      result = await query("CREATE EVENT delete_token ON SCHEDULE AT '" + UTCtoSQLDate(user.exp) + "' DO DELETE FROM expiredJWT WHERE jti='" + user.jti + "';");
-      if(result.error !== undefined) return res.status(500).send(); 
+      if(result.error !== undefined) return res.status(500).send();
+      result = await query("CREATE EVENT delete_" + user.jti + " ON SCHEDULE AT '" + UTCtoSQLDate(user.exp) + "' DO DELETE FROM expiredJWT WHERE jti='" + user.jti + "';");
+      if(result.error !== undefined) return res.status(500).send();
 
       return res.sendStatus(204);
     });    
@@ -138,36 +138,37 @@ exports.addAuthentication = addAuthentication;
 
 function checkLoginFormat(req, res, next) {
   let user = req.body;
-  if(user === undefined) return res.status(400).send("There are no email and password values");
-  if(user.password === undefined) return res.status(400).send("there is no password field");
-  if(user.email === undefined) return res.status(400).send("There is no email field");
-  
-  if(typeof user.email !== 'string' && !(user.email instanceof String)) return res.status(400).send("Please enter a string for the email");
-  if(typeof user.password !== 'string' && !(user.password instanceof String)) return res.status(400).send("Please enter a string for the email");
-  
-  if(user.password === '') return res.status(400).send("There is no password value");
-  if(user.email === '') return res.status(400).send("There is no email value");
+  console.log(user);
+  if(user === undefined) return res.status(400).json({error : "There are no email and password values"});
+  if(user.password === undefined) return res.status(400).json({error : "there is no password field"});
+  if(user.email === undefined) return res.status(400).json({error : "There is no email field"});
 
-  if(user.email.length > 320) return res.status(400).send("The email is too long");
-  if(user.password.length > 72) return res.status(400).send("max character length for the password is 72 characters");
+  if(typeof user.email !== 'string' && !(user.email instanceof String)) return res.status(400).json({error : "Please enter a string for the email"});
+  if(typeof user.password !== 'string' && !(user.password instanceof String)) return res.status(400).json({error : "Please enter a string for the email"});
+  
+  if(user.password === '') return res.status(400).json({error : "There is no password value"});
+  if(user.email === '') return res.status(400).json({error : "There is no email value"});
+
+  if(user.email.length > 320) return res.status(400).json({error : "The email is too long"});
+  if(user.password.length > 72) return res.status(400).json({error : "max character length for the password is 72 characters"});
   
   next();
 }
 
 function checkEmailFormat(req, res, next) {
   email = req.body.email;
-  if(!email.includes('@')) return res.status(400).send("this email doesn't contain a @ symbol");
-  if(email.split('@')[0].length === 0) return res.status(400).send("this email doesn't contain a prefix");
-  if(email.includes('..') || !(/.\../.test(email.split('@')[1]))) return res.status(400).send("this email doesn't contain a valid domian"); //checks if there are two dots next to eachother and if the email's dots have text on either side
+  if(!email.includes('@')) return res.status(400).json({error : "this email doesn't contain a @ symbol"});
+  if(email.split('@')[0].length === 0) return res.status(400).json({error : "this email doesn't contain a prefix"});
+  if(email.includes('..') || !(/.\../.test(email.split('@')[1]))) return res.status(400).json({error : "this email doesn't contain a valid domian"}); //checks if there are two dots next to eachother and if the email's dots have text on either side
   
   next();
 }
 function checkUserNameFormat(req, res, next) {
   userName = req.body.userName;
-  if(userName === undefined) return res.status(400).send("There is no username field");
-  if(typeof userName !== 'string' && !(userName instanceof String)) return res.status(400).send("Please enter a string for the username");
-  if(userName === '') return res.status(400).send('There is no email value');
-  if(userName.length > 100) return res.status(400).send('The username is too long');
+  if(userName === undefined) return res.status(400).json({error : "There is no username field"});
+  if(typeof userName !== 'string' && !(userName instanceof String)) return res.status(400).json({error : "Please enter a string for the username"});
+  if(userName === '') return res.status(400).json({error : 'There is no email value'});
+  if(userName.length > 100) return res.status(400).json({error : 'The username is too long'});
 
   next();
 }

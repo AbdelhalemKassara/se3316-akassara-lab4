@@ -1,4 +1,5 @@
 import React, {useRef} from 'react'
+import queryBackend from '../queryBackend';
 
 export default function SignUp() {
   const email = useRef('');
@@ -8,15 +9,15 @@ export default function SignUp() {
 
   async function createUser() {
 
-    if(password.current.value == '') {alert("Password is blank"); return;}
-    if(password.current.value != confirmPassword.current.value) {alert("passwords don't match"); return;}
-    if(username.current.value == '') {alert("username is blank"); return;}
-    if(email.current.value == '') {alert("Email is blank"); return;}
+    if(password.current.value === '') {alert("Password is blank"); return;}
+    if(password.current.value !== confirmPassword.current.value) {alert("passwords don't match"); return;}
+    if(username.current.value === '') {alert("username is blank"); return;}
+    if(email.current.value === '') {alert("Email is blank"); return;}
 
     //check if there is an existing user
     if(true) {
       //add user
-      let result = await fetch('/api/account/createAccount', {
+      let result = await queryBackend('/api/account/createAccount', {
         method : 'POST',
         headers : {
           'Content-Type': 'application/json'
@@ -41,9 +42,6 @@ export default function SignUp() {
 
   return (
   <div id="Authentication"> 
-        <button id="signUpWithGoogle">Continue With Google</button>
-      <p>or</p>
-
     <div className="AuthenticationInput">
       <div>
         <p>Email address</p>

@@ -1,5 +1,5 @@
 const {query, startDatabaseConnection, UTCtoSQLDate, CurSQLDate} = require('./databaseConnection');
-
+const aboutMessage = require('./aboutMessage.json');
 function addPublicRoutes(playlists, search, router) {
     //*Get (retrieve)
   router.get('/genres',(req, res) => {
@@ -15,11 +15,14 @@ function addPublicRoutes(playlists, search, router) {
     WHERE playlist.publicVisibility=1) AS res on res.userID = user.id ORDER BY dateLastChanged DESC LIMIT 10;`);
 
     if(publicPlaylists.error !== undefined) return res.status(500).send();
-    console.log(publicPlaylists.result);
 
     res.json(publicPlaylists.result);
   });
   
+  router.get('/about', (req, res) => {
+    return res.json(aboutMessage);
+  });
+
   //given a track id it will return a track or error message
   router.get('/track/:id', (req, res) => {
   });

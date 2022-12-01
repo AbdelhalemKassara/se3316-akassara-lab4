@@ -14,6 +14,10 @@ DELETE FROM user;
 
 DELETE FROM Playlist WHERE name='playlist3';
 
+SHOW EVENTS FROM expiredJWT;
+
+SELECT COUNT(*) FROM expiredJWT;
+
 SELECT * FROM playlist;
 SELECT id FROM track;
 
