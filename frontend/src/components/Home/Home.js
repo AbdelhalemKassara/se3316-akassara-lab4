@@ -8,12 +8,12 @@ export default function Home() {
 
     useEffect(() => {
       async function fetchData() {
-      let result = await queryBackend('/api/playlists');
-      setPlaylistsInfo(await result.json());
+      let {resultBody} = await queryBackend('/api/playlists');
+      setPlaylistsInfo(resultBody);
       
-      let aboutMessage = await queryBackend('/api/about');
-      aboutMessage = await aboutMessage.json();
-      setAboutMessage(aboutMessage.message);
+      let {resultBody : resultBody1} = await queryBackend('/api/about');
+      let message = await resultBody1;
+      setAboutMessage(message.message);
     }
     fetchData();
     }, [])

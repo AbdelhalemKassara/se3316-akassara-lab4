@@ -1,3 +1,4 @@
+//////////////////////////////////////////////test this pile of crap
 export default async function queryBackend(path, init = {}, admin = false) {
   
   //adds the access token to the query
@@ -9,9 +10,9 @@ export default async function queryBackend(path, init = {}, admin = false) {
 
   //executes the query
   let result = await fetch(path, init);
-  
+  let tempFix = await result.json();
   //if it is 'forbidden' and only for users then get a new token otherwise return the value
-  if(result.status === 403 && (await result.json().accessLevel === 'logged in user' || admin)) {
+  if(result.status === 403 && (tempFix.accessLevel === 'logged in user' || admin)) {
     let token = await fetch('/api/account/accesstoken', {
       method : 'POST',
       headers : {
@@ -20,38 +21,15 @@ export default async function queryBackend(path, init = {}, admin = false) {
     });
     
     if(token.ok) {
-      localStorage.setItem('accessToken', await token.json().accessToken);
+      token = await token.json();
+      localStorage.setItem('accessToken', token.accessToken);
       return await fetch(path, init);
     } else {
       alert('You need to be logged in to do this query');
       //reset the ui so shows as the user logged out
     }
   } else {
-    return result;
-  }
-}
-
-export async function logIn(credentials) {
-  let result = await fetch('/api/account/login', {
-      method : 'POST',
-      headers : {
-        'Content-Type': 'application/json'
-      },
-      body : JSON.stringify({
-        email : credentials.email,
-        password : credentials.password
-      })
-  });
-
-  if(result.ok) {
-    result = await result.json();
-    localStorage.setItem('accessToken', result.accessToken);
-    localStorage.setItem('refreshToken', result.refreshToken);
-    return true;
-  } else {
-    result = await result.json();
-    alert(result.error);
-    return false;
+    return {resultHTTP : result, resultBody : tempFix};
   }
 }
 

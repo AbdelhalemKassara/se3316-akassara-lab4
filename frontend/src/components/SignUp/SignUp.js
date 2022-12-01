@@ -17,7 +17,7 @@ export default function SignUp() {
     //check if there is an existing user
     if(true) {
       //add user
-      let result = await queryBackend('/api/account/createAccount', {
+      let {resultHTTP, resultBody} = await queryBackend('/api/account/createAccount', {
         method : 'POST',
         headers : {
           'Content-Type': 'application/json'
@@ -29,10 +29,9 @@ export default function SignUp() {
         })
       })
 
-      if(result.ok) {
-        result = await result.json();
+      if(resultHTTP.ok) {
         if(window.confirm('this will take you to verify your account.')) {
-          window.location.href = result.verificationLink;
+          window.location.href = resultBody.verificationLink;
         }
       }
     }
