@@ -10,6 +10,8 @@ ALTER TABLE user ADD COLUMN admin BOOLEAN DEFAULT 0;
 ##make the email in the user table unqiue
 SELECT * FROM user;
 
+UPDATE user SET disabled=1 WHERE id=68;
+
 DELETE FROM user;
 
 DELETE FROM Playlist WHERE name='playlist3';
@@ -41,3 +43,6 @@ SELECT * FROM playlist LEFT JOIN (
 SELECT COUNT(*) AS numOfTracks, SEC_TO_TIME(SUM(time_to_sec(duration))) AS duration, p.playlistID  
 FROM playlistTrack AS p JOIN track AS t ON t.id = p.trackID GROUP BY p.playlistID) AS a ON a.playlistID = playlist.id 
 WHERE playlist.publicVisibility=1) AS res on res.userID = user.id ORDER BY dateLastChanged DESC LIMIT 10; 
+
+
+SELECT track.* FROM (SELECT * FROM playlistTrack WHERE playlistID=7) AS pTracks JOIN track WHERE pTracks.trackID = track.id;

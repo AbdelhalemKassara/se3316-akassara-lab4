@@ -56,14 +56,14 @@ function addAuthentication(userCred) {
     let user = await query("SELECT * FROM user WHERE email='"+req.body.email+"' LIMIT 1;");
     if(user.error !== undefined) return res.status(500).send();
     
-    if(user.result.length == 0) return res.status(400).send('Cannot find user');
+    if(user.result.length == 0) return res.status(400).json({error : 'Cannot find user'});
     user = user.result[0];
 
     //verifys the password
     try {
       if(await bcrypt.compare(req.body.password, user.password)) {
         //check if the user is disabled or if they haven't verified their email yet
-        if(user.disabled) return res.status(403).send("User is currently disabled");
+        if(user.disabled) return res.status(403).json({error : "account is currently disabled, please contact administrators."});
         if(!user.verifiedEmail) return res.status(403).json({verificationLink : req.protocol + "://" + req.get('host') + '/api/account/verification/' + await generateAccountVerificationToken(user)});
         
         //the user exists

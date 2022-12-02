@@ -2,27 +2,23 @@ import React, {useEffect, useState} from 'react'
 import PlaylistIcon from '../PlaylistIcon/PlaylistIcon';
 import {fetchWrapper} from '../queryBackend';
 
-export default function Home() {
-  const [aboutMessage, setAboutMessage] = useState("placeholder");
-  const [playlistsInfo, setPlaylistsInfo] = useState([]);
-
+export default function Home(props) {
+  const [aboutMessage, setAboutMessage] = useState("");
+  
   useEffect(() => {
-    async function fetchData() {
-    let {body} = await fetchWrapper('/api/playlists');
-    setPlaylistsInfo(body);
-    
-    let {body : about} = await fetchWrapper('/api/about');
-    let message = await about;
-    setAboutMessage(message.message);
-  }
-  fetchData();
-  }, [])
+    async function fetchAboutMessage() {
+      let {body : about} = await fetchWrapper('/api/about');
+      let message = await about;
+      setAboutMessage(message.message);
+    }
+    fetchAboutMessage();
+    }, []);
 
   return (
   <>
   <p>{aboutMessage}</p>
   <div className="preview-public-playlists">
-    {playlistsInfo.map((list) => (<PlaylistIcon key={list.playlistID} playlistName={list.name} tracksCount={list.numOfTracks} playTime={list.duration} rating={0} dateLastChanged={list.dateLastChanged} user={list.userName}/>))}
+    {props.publicPlaylists.map((list) => (<PlaylistIcon key={list.playlistID} id={list.playlistID} playlistName={list.name} tracksCount={list.numOfTracks} playTime={list.duration} rating={0} dateLastChanged={list.dateLastChanged} user={list.userName}/>))}
   </div>
   </>);
 }

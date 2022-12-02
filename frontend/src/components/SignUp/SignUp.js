@@ -27,11 +27,9 @@ export default function SignUp() {
       })
     })
 
-    if(result.ok) {
-      if(window.confirm('this will take you to verify your account.')) {
+    if(result.ok && window.confirm('this will take you to verify your account.')) {
         window.location.href = body.verificationLink;
-      }
-    } else if(result.status === 400) {
+    } else if(result.status === 400 && body.error) {
       alert(body.error);
     }
   }

@@ -3,16 +3,27 @@ import Home from './components/Home/Home';
 import LogIn from './components/LogIn/LogIn';
 import SignUp from './components/SignUp/SignUp';
 import NavBar from './components/NavBar/NavBar';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import './App.css';
 import {logOut, fetchWrapper} from './components/queryBackend';
 import PlaylistReview from './components/loggedIn/PlaylistReview/PlaylistReview';
-import UserPlaylist from './components/loggedIn/UserPlaylist/UserPlaylist';
+import Playlist from './components/Playlist/Playlist';
 import UserPlaylists from './components/loggedIn/UserPlaylists/UserPlaylists';
 import ChangePassword from './components/loggedIn/ChangePassword/ChangePassword';
 import jwtDecode from 'jwt-decode';
+import TrackInfo from './components/TrackInfo/TrackInfo';
 
 function App() {
+  const [publicPlaylists, setPublicPlaylists] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+    let {body} = await fetchWrapper('/api/playlists');
+    setPublicPlaylists(body);
+  }
+  fetchData();
+  }, [])
+
   const [user, setUser] = useState(() => {
     let token = localStorage.getItem('refreshToken');
     if(token) {
@@ -41,7 +52,11 @@ function App() {
       setUser(jwtDecode(localStorage.getItem('refreshToken')));
     } else {
       result = await result.json();
-      alert(result.error);
+      if(result.verificationLink && window.confirm('this will take you to verify your account.')) {
+        window.location.href = result.verificationLink;
+      } else {
+        alert(result.error ? result.error : 'There was in issue logging you in');
+      }
     }
   }
 
@@ -74,13 +89,23 @@ function App() {
       <NavBar user={user.email} userName={user.userName} onLogout={logOutUser}/>
       <div id="main-content">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/account/login" element={<LogIn onLogin={loginUser}/> } />
-          <Route path="/account/signup" element={<SignUp /> } />
-          <Route path="/loggedin/playlistReview" element={<PlaylistReview />} />
-          <Route path="/loggedin/playlist" element={<UserPlaylist />} />
-          <Route path="/loggedin/playlists" element={<UserPlaylists />} />
-          <Route path="/loggedin/changepassword" element={<ChangePassword onChangePassword={changePassword}/>} />
+          <Route path="/" element={<Home publicPlaylists={publicPlaylists}/>} />
+
+          <Route path="/account">
+            <Route path="login" element={<LogIn onLogin={loginUser}/> } />
+            <Route path="signup" element={<SignUp /> } />
+          </Route>
+
+          <Route path="/playlist/:id" element={<Playlist publicPlaylists={publicPlaylists}/>} />
+          <Route path="/track/:id" element={<TrackInfo />} />
+          <Route path='/loggedin'> 
+            <Route path="playlists" element={<UserPlaylists />} />
+            <Route path="changepassword" element={<ChangePassword onChangePassword={changePassword}/>} />
+            <Route path="playlistReview" element={<PlaylistReview />} />
+          </Route>
+  
+
+          <Route path="*" element={<p>404 Not Found</p>} />
         </Routes>
       </div>
     </>

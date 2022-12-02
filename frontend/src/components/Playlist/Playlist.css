@@ -1,0 +1,34 @@
+.tracks {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr 1fr 60px;
+}
+
+.table-lable, .table-lable-ed {
+  margin: 0;
+  padding: 0;
+  border-style: none solid none none;
+  border-width: 1px;
+  display: flex;
+  justify-content: space-around;
+
+  background-color: rgb(199, 199, 199);
+}
+
+.table-lable-ed {
+  border-style: none;
+}
+
+.data-lable {
+  margin: 0;
+  padding: 0;
+  border-style: none solid  solid none;
+  border-width: 1px;
+  display: flex;
+  justify-content: space-around;
+
+}
+.data-lable-st {
+  border-style: none solid  solid solid;
+  border-width: 1px;
+  
+}

@@ -24,8 +24,30 @@ function addPublicRoutes(playlists, search, router) {
   });
 
   //given a track id it will return a track or error message
-  router.get('/track/:id', (req, res) => {
+  router.get('/tracks/:playlistId', async (req, res) => {
+    let id = req.params.playlistId;
+    if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
+
+    let tracks = await query('SELECT track.* FROM (SELECT * FROM playlistTrack WHERE playlistID='+ id + ') AS pTracks JOIN track WHERE pTracks.trackID = track.id;');
+    if(tracks.error !== undefined) return res.sendStatus(500);
+
+    return res.json(tracks.result);
   });
+  
+  //given a track id it will return the track or an error message
+  router.get('/track/:id', async (req, res) => {
+    let id = req.params.id;
+    if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
+
+    let track = await query('SELECT * FROM track WHERE id=' + id);
+    if(track.error !== undefined) return res.sendStatus(500);
+
+    if(track.result.length === 0) return res.status(404).json({error : "This track id doesn't exist"});
+    
+    return res.json(track.result[0]);
+    
+  });
+  
   router.get('/artist/:id', (req, res) => {
   });
   router.get('/album/:id', (req, res) => {
@@ -36,9 +58,7 @@ function addPublicRoutes(playlists, search, router) {
   //given an artist name it will return a list of artists ids or an error message
   search.get('/artist/:name', (req, res) => {
   });
-  //given a playlist id it will return the tracks contained within it or an error message
-  playlists.get('/tracks/:id', (req, res) => {
-  });
+
 
   //given a playlist id and set of tracks it will replace the tracks with the new ones or return an error message
   playlists.put('/updateList/:id', (req, res) => {
