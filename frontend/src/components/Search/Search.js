@@ -6,9 +6,10 @@ import './Search.css';
 
 export default function Search() {
   const searchBar = useRef('');
-  const [artist, setArtist] = useState('');
-  const [track, setTrack] = useState('');
-  const [genre, setGenre] = useState('');
+  const [searchVal, setSearchVal] = useState('');
+  const artist = useRef('');
+  const track = useRef('');
+  const genre = useRef('');
   const [active, setActive] = useState('artist');
   const [results, setResults] = useState(() => {
     return []});
@@ -16,43 +17,43 @@ export default function Search() {
     useEffect(() => {
       search();
     }, []);
-    
-  function toggleButton(str) {
-    
-    if(active === 'genre') {
-      setGenre(searchBar.current.value);
-    } else if(active === 'track') {
-      setTrack(searchBar.current.value);
-    } else if(active === 'artist') {
-      setArtist(searchBar.current.value);
-    } 
 
+    useEffect(() => {
+      if(active === 'genre') {
+        genre.current = searchVal;
+      } else if(active === 'track') {
+        track.current = searchVal;
+      } else if(active === 'artist') {
+        artist.current = searchVal;
+      } 
+    }, [searchVal]);
+
+  function toggleButton(str) {  
     setActive(str);
     if(str === 'genre') {
-      searchBar.current.value = genre;
+      setSearchVal(genre.current);
     } else if(str === 'track') {
-      searchBar.current.value = track;
+      setSearchVal(track.current);
     } else if(str === 'artist') {
-      searchBar.current.value = artist;
+      setSearchVal(artist.current);
     } else {
-      searchBar.current.value = "";
+      setSearchVal('');
     }
-
-    console.log(artist, ' ' , track, ' ', genre);
   }
+
   function clearAllVals() {
-    setGenre('');
-    setTrack('');
-    setArtist('');
-    searchBar.current.value = "";
+    genre.current = '';
+    track.current = '';
+    artist.current = '';
+    setSearchVal('');
   }
 
 
   async function search() {
     let query = "/api/search?";
-    query += artist !== ""? "artist=" + artist: "artist";
-    query += track !== ""? "&track="+ track : "&track";
-    query += genre !== ""? "&genre=" + genre: "&genre";
+    query += artist !== ""? "artist=" + artist.current : "artist";
+    query += track !== ""? "&track="+ track.current : "&track";
+    query += genre !== ""? "&genre=" + genre.current : "&genre";
 
     let {result, body} = await fetchWrapper(query);
     if(result.ok) {
@@ -64,11 +65,10 @@ export default function Search() {
   return (<>
   <div className="search-bar"> 
     <button onClick={() => clearAllVals()}>Clear All Values</button>
-    <input type="text" placeholder={active} ref={searchBar} disabled={active === 'all'}/>
+    <input type="text" placeholder={active} value={searchVal} onChange={(e) => setSearchVal(e.target.value)}/>
     <button onClick={() => search()}>Search</button>
   </div>
   <div className="search-terms">
-      <button onClick={() => toggleButton('all')}>All</button>
       <button onClick={() => toggleButton('artist')}>Artist</button>
       <button onClick={() => toggleButton('track')}>Track</button>
       <button onClick={() => toggleButton('genre')}>genre</button>
