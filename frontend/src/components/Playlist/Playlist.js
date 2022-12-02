@@ -68,6 +68,7 @@ export default function Playlist(props) {
       artist={track.artistName} 
       duration={track.duration} 
       title={track.title}
+      albumName={track.albumName}
       header={false}/>))}
     </div>
     

@@ -12,6 +12,7 @@ import UserPlaylists from './components/loggedIn/UserPlaylists/UserPlaylists';
 import ChangePassword from './components/loggedIn/ChangePassword/ChangePassword';
 import jwtDecode from 'jwt-decode';
 import TrackInfo from './components/TrackInfo/TrackInfo';
+import Search from './components/Search/Search';
 
 function App() {
   const [publicPlaylists, setPublicPlaylists] = useState([]);
@@ -98,6 +99,8 @@ function App() {
 
           <Route path="/playlist/:id" element={<Playlist publicPlaylists={publicPlaylists}/>} />
           <Route path="/track/:id" element={<TrackInfo />} />
+          <Route path='/search' element={<Search />} />
+          
           <Route path='/loggedin'> 
             <Route path="playlists" element={<UserPlaylists />} />
             <Route path="changepassword" element={<ChangePassword onChangePassword={changePassword}/>} />
