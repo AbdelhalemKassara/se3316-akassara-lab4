@@ -5,7 +5,7 @@ import SignUp from './components/SignUp/SignUp';
 import NavBar from './components/NavBar/NavBar';
 import {useState} from 'react';
 import './App.css';
-import queryBackend, {logOut} from './components/queryBackend';
+import {logOut, fetchWrapper} from './components/queryBackend';
 import PlaylistReview from './components/loggedIn/PlaylistReview/PlaylistReview';
 import UserPlaylist from './components/loggedIn/UserPlaylist/UserPlaylist';
 import UserPlaylists from './components/loggedIn/UserPlaylists/UserPlaylists';
@@ -54,7 +54,7 @@ function App() {
     }
   }
   const changePassword = async (password) => {
-    let {resultHTTP, resultBody} = await queryBackend('/api/account/loggedin/changepassword', {
+    let {result} = await fetchWrapper('/api/account/loggedin/changepassword', {
       method : 'PUT',
       headers : {
         'Content-Type' : 'application/json'
@@ -64,7 +64,7 @@ function App() {
       })
     })
 
-    if(resultHTTP.ok) {
+    if(result.ok) {
       alert("Your password has been updated");
     }
   }

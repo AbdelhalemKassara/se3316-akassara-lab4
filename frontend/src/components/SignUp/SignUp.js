@@ -1,5 +1,5 @@
 import React, {useRef} from 'react'
-import queryBackend from '../queryBackend';
+import {fetchWrapper} from '../queryBackend';
 
 export default function SignUp() {
   const email = useRef('');
@@ -14,29 +14,26 @@ export default function SignUp() {
     if(username.current.value === '') {alert("username is blank"); return;}
     if(email.current.value === '') {alert("Email is blank"); return;}
 
-    //check if there is an existing user
-    if(true) {
-      //add user
-      let {resultHTTP, resultBody} = await queryBackend('/api/account/createAccount', {
-        method : 'POST',
-        headers : {
-          'Content-Type': 'application/json'
-        },
-        body : JSON.stringify({
-          email : email.current.value,
-          userName : username.current.value,
-          password : password.current.value
-        })
+    //add user
+    let {result, body} = await fetchWrapper('/api/account/createAccount', {
+      method : 'POST',
+      headers : {
+        'Content-Type': 'application/json'
+      },
+      body : JSON.stringify({
+        email : email.current.value,
+        userName : username.current.value,
+        password : password.current.value
       })
+    })
 
-      if(resultHTTP.ok) {
-        if(window.confirm('this will take you to verify your account.')) {
-          window.location.href = resultBody.verificationLink;
-        }
+    if(result.ok) {
+      if(window.confirm('this will take you to verify your account.')) {
+        window.location.href = body.verificationLink;
       }
+    } else if(result.status === 400) {
+      alert(body.error);
     }
-
-    
   }
 
   return (
