@@ -134,7 +134,7 @@ function addPublicRoutes(playlists, search, router) {
       queryStr += genres !== "" ? " field(genre.title, " + genres.slice(1, genres.length) + ", " : "";
 
       queryStr = queryStr.slice(0, queryStr.length-2);//remove last comma
-      queryStr += ";";
+      queryStr += " LIMIT 100;";
       return queryStr;
     }
     function formatArrStr(arr, minRating) {
