@@ -5,7 +5,7 @@ let con = mysql.createConnection(credentials);
 
 
 //returns either an error object or an result object
-async function query(sqlCommand, data, ) {
+async function query(sqlCommand, data) {
   let params = [sqlCommand];
   if(data !== undefined) params.push([data]);
 
