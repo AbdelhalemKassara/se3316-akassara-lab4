@@ -82,33 +82,31 @@ function addPublicRoutes(playlists, search, router) {
     let ratedArtistsStr = "";
     let ratedTracksStr = "";
     //combine the results(add tags to identify where they came from) then sort
-    if(ratedTracks !== undefined) {ratedTracksStr = formatArrStr(ratedTracks.ratings.sort(sortRated), 0);}
-    if(ratedArtists !== undefined) {ratedArtistsStr = formatArrStr(ratedArtists.ratings.sort(sortRated), 0);}
-    if(ratedGenres !== undefined) {ratedGenresStr = formatArrStr(ratedGenres.ratings.sort(sortRated), 0);}//(sortedRate).slice(0, 10)
+    if(ratedTracks !== undefined) {ratedTracksStr = formatArrStr(ratedTracks.ratings.sort(sortRated), 0.25);}
+    if(ratedArtists !== undefined) {ratedArtistsStr = formatArrStr(ratedArtists.ratings.sort(sortRated), 0.25);}
+    if(ratedGenres !== undefined) {ratedGenresStr = formatArrStr(ratedGenres.ratings.sort(sortRated), 0.25);}//(sortedRate).slice(0, 10)
    
     let result = {};
-    
-    let queryArtist = ratedArtistsStr === "" ? ratedArtistsStr : "artistName IN " +ratedArtistsStr;
-    let queryTrack = ratedTracksStr === "" ? ratedTracksStr : "title IN " + ratedTracksStr;
-    console.log(queryArtist, queryTrack);
-
-    let queryStr = `SELECT t.id, t.albumID, t.artistID, t.licenseTitle, t.bitRate, t.composer, t.copyrightC, t.copyrightP, t.dateCreated, 
-    t.dateRecorded, t.discNumber, t.duration, t.number, t.publisher, t.title, t.artistName, t.albumName, genre.title AS genre 
-    FROM (SELECT track.*, trackGenres.genreID FROM track JOIN trackGenres ON track.id=trackGenres.trackID) AS t JOIN genre ON genre.id =t.genreID
-    WHERE`
-
-    if((searchTerms.artist === "" || !(/\S/.test(searchTerms.artist))) && (searchTerms.track === "" || !(/\S/.test(searchTerms.track))) && (searchTerms.genre === "" || !(/\S/.test(searchTerms.genre)))) {
+    if(searchTerms.artist === "" && searchTerms.track === "" && searchTerms.genre === "") {
       result = await query("SELECT * FROM track;");
-    } else if(queryArtist !== "" || queryTrack !== ""){
-      result = await query("SELECT * FROM track WHERE " + queryArtist + (queryArtist === "" || queryTrack === ""? queryTrack : " AND " + queryTrack) + ";");
+    } else if(ratedArtistsStr !== "" || ratedTracksStr !== "" || ratedGenresStr !== ""){ 
+      //add another condition for single letters and a WHERE statement (currently single letters aren't accepted)
+      result = await query(formQueryStr(ratedArtistsStr, ratedTracksStr, ratedGenresStr));
     } 
-    //put result in a map and combine the genres (track.id, {...result[0], genres : [result[0].genre]})
+    if(result.error !== undefined) return res.sendStatus(500);
 
-    console.log(result);
-    // result.result.forEach(val =>{
-    //   console.log(val.title, ' ', val.artistName)
-    // })
-    
+    //there are multiple rows in the result.result object that are the same except for the genre, this combines them
+    let out = new Map();
+    result.result.forEach(val => {
+      if(out.has(val.id)) {
+        out.get(val.id).genre.push(val.genre);
+
+      } else {
+        out.set(val.id, {...val, genre : [val.genre]});
+      }
+    })
+    return res.status(200).json(Array.from(out.values()));
+
     //functions
     function sortRated(a, b) {//note this function is an invalid sort method. I changed it as sort only sorts by least to greatest and I prefer the reverse
       if(a.rating < b.rating) return 1;
@@ -122,10 +120,21 @@ function addPublicRoutes(playlists, search, router) {
       FROM (SELECT track.*, trackGenres.genreID FROM track JOIN trackGenres ON track.id=trackGenres.trackID) AS t JOIN genre ON genre.id =t.genreID
       WHERE`;
 
-      queryStr += artists;
-      queryStr += queryStr.charAt(queryStr.length-1) === ')' && track !== "" ? " AND " + tracks : tracks;
-      queryStr += queryStr.charAt(queryStr.length-1) === ')' && genres !== "" ? " AND " + genres : genres;
+      queryStr += artists !== "" ? " t.artistName IN " + artists : artists;
 
+      queryStr += queryStr.charAt(queryStr.length-1) === ')' && tracks !== "" ? " AND" : "";
+      queryStr += tracks !== "" ? " t.title IN " + tracks : tracks;
+
+      queryStr += queryStr.charAt(queryStr.length-1) === ')' && genres !== "" ? " AND" : "";
+      queryStr += genres !== "" ? " genre.title IN " + genres : genres;
+
+      queryStr += " ORDER BY ";
+      queryStr += tracks !== "" ? " field(t.title, " + tracks.slice(1, tracks.length) + ", " : "";
+      queryStr += artists !== "" ? " field(t.artistName, " + artists.slice(1, artists.length) + ", " : "";
+      queryStr += genres !== "" ? " field(genre.title, " + genres.slice(1, genres.length) + ", " : "";
+
+      queryStr = queryStr.slice(0, queryStr.length-2);//remove last comma
+      queryStr += ";";
       return queryStr;
     }
     function formatArrStr(arr, minRating) {
