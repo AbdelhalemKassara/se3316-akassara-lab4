@@ -12,7 +12,7 @@ function addAuthentication(userCred) {
     //check if the user already exists
     let queryUser = await query("SELECT * FROM user WHERE email='" + req.body.email + "' LIMIT 1;");
     if(queryUser.error !== undefined && queryUser.result === undefined) return res.status(500).send();
-    if(queryUser.result.length !== 0) return res.status(400).send('There is an account already created with this email.');
+    if(queryUser.result.length !== 0) return res.status(400).json({ error : 'There is an account already created with this email.'});
 
     
     //create the user
