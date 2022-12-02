@@ -52,7 +52,7 @@ function addPublicRoutes(playlists, search, router) {
   });
   
   router.get('/search', verifySearchInput, async (req, res) => {
-    let searchTerms = req.body;
+    let searchTerms = req.query;
 
     let ratedTracks;
     let ratedArtists;
@@ -88,11 +88,13 @@ function addPublicRoutes(playlists, search, router) {
    
     let result = {};
     if(searchTerms.artist === "" && searchTerms.track === "" && searchTerms.genre === "") {
-      result = await query("SELECT * FROM track;");
+      result = await query("SELECT * FROM track LIMIT 100;");
     } else if(ratedArtistsStr !== "" || ratedTracksStr !== "" || ratedGenresStr !== ""){ 
       //add another condition for single letters and a WHERE statement (currently single letters aren't accepted)
       result = await query(formQueryStr(ratedArtistsStr, ratedTracksStr, ratedGenresStr));
-    } 
+    } else {
+      return res.status(400).json({error : "Please enter more than one letter"})
+    }
     if(result.error !== undefined) return res.sendStatus(500);
 
     //there are multiple rows in the result.result object that are the same except for the genre, this combines them
@@ -180,7 +182,8 @@ function addPublicRoutes(playlists, search, router) {
 }
 
 function verifySearchInput(req, res, next) {
-  let searchTerms = req.body;
+  let searchTerms = req.query;
+
   if(searchTerms === undefined || searchTerms === null) return res.status(400).json({error : "Please enter artist, track, and genre values"});
 
   if(searchTerms.artist === undefined) return res.status(400).json({error : "Please enter a value or empty string for artist."});
