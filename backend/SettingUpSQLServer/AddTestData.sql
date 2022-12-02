@@ -38,7 +38,22 @@ SELECT track.* FROM (SELECT * FROM playlistTrack WHERE playlistID=7) AS pTracks 
 
 
 SELECT id,title AS trackTitle FROM track;
-SELECT id,artistName FROM track;
-SELECT id AS genreID, title AS genre FROM genre;
+SELECT id,artistName FROM track; #should be unique
+SELECT id AS genreID, title AS genre FROM genre;#all values are unique
 
+SELECT title, COUNT(*) AS c FROM genre GROUP BY title ORDER BY c DESC;
+SELECT title, COUNT(*) AS c FROM track GROUP BY title ORDER BY c DESC;
+
+SELECT DISTINCT artistName FROM track;
+
+SELECT *  FROM track WHERE artistName 
+IN ('Kurt Vile', 'Kurteek', 'Vurt', 'Gurtz','Kurt Baker' ) AND title IN ('Free', 'Freeway','Freeze', 'Free Me','Be Free' );
+
+SELECT * FROM track WHERE artistName IN ('Kurt Vile') AND title IN ('Freeway', 'Space Forklift');
+
+SELECT t.id, t.albumID, t.artistID, t.licenseTitle, t.bitRate, t.composer, t.copyrightC, t.copyrightP, t.dateCreated, t.dateRecorded, t.discNumber, t.duration, t.number, t.publisher, t.title, t.artistName, t.albumName, genre.title AS genre FROM (SELECT track.*, trackGenres.genreID FROM track JOIN trackGenres ON track.id=trackGenres.trackID) AS t JOIN genre ON genre.id =t.genreID WHERE t.id=20;
+
+SELECT t.id, t.artistName, genre.title AS genre FROM (SELECT track.*, trackGenres.genreID FROM track JOIN trackGenres ON track.id=trackGenres.trackID) AS t JOIN genre ON genre.id =t.genreID;
+
+SELECT title, artistName FROM track;
 SELECT trackID FROM trackGenres JOIN genre on genre.id = trackGenres.genreID WHERE genre.id = 1;
