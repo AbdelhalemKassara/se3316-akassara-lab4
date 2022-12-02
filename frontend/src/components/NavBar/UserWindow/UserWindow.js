@@ -8,6 +8,7 @@ export default function UserWindow(props) {
   const toggleState = () => {
     setDisplayMenu(!displayMenu);
   }
+
   useEffect(() => {
     if(!props.userName) {
       setDisplayMenu(false);
@@ -19,9 +20,9 @@ export default function UserWindow(props) {
       return (<>
         <Link className="Nav-Bar-Item" id="User" onClick={toggleState}>{props.userName}</Link>
             <div id="user-window"> 
-            <Link to='/loggedin/changepassword'>Change Password</Link>
-            <Link to='user/playlists'>Playlists</Link>
-            <Link onClick={() => props.onLogout()}>Log out</Link>
+            <Link to='/loggedin/changepassword' onClick={toggleState}>Change Password</Link>
+            <Link to='user/playlists' onClick={toggleState}>Playlists</Link>
+            <Link onClick={() => {props.onLogout()}}>Log out</Link>
             </div>
           </>
         )

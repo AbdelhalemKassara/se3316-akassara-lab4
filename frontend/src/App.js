@@ -48,25 +48,30 @@ function App() {
   const logOutUser = async () => {
     if(await logOut()) {
       setUser({});
+      alert('You have been logged out');
+    } else {
+      alert('There was an issue when trying to log you out');
     }
   }
   const changePassword = async (password) => {
     let {resultHTTP, resultBody} = await queryBackend('/api/account/loggedin/changepassword', {
       method : 'PUT',
+      headers : {
+        'Content-Type' : 'application/json'
+      },
       body : JSON.stringify({
         password : password
       })
-      
     })
 
     if(resultHTTP.ok) {
       alert("Your password has been updated");
     }
   }
-
+  
   return (
     <>
-      <NavBar user={user.email} userName={user.userName} onLogout={logOutUser} onChangePassword={changePassword}/>
+      <NavBar user={user.email} userName={user.userName} onLogout={logOutUser}/>
       <div id="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -75,7 +80,7 @@ function App() {
           <Route path="/loggedin/playlistReview" element={<PlaylistReview />} />
           <Route path="/loggedin/playlist" element={<UserPlaylist />} />
           <Route path="/loggedin/playlists" element={<UserPlaylists />} />
-          <Route path="/loggedin/changepassword" element={<ChangePassword />} />
+          <Route path="/loggedin/changepassword" element={<ChangePassword onChangePassword={changePassword}/>} />
         </Routes>
       </div>
     </>
