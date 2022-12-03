@@ -70,6 +70,21 @@ function addLoggedInRoutes(user) {
       return res.sendStatus(500);
     }
   });
+
+  user.get('/tracks/:playlistID', async (req, res) => {
+    let id = req.params.playlistID;
+    if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
+    
+    let result = await query(`SELECT userID FROM playlist WHERE id=${id};`);
+    if(result.error !== undefined) return res.sendStatus(500);
+    if(result.result.length == 0) return res.stauts(400).send({error : "This playlist doesn't exist."});
+    if(result.result[0].userID !== req.user.id) return res.status(403).send({error : "This playlist is owned by another user."})
+    
+    let tracks = await query(`SELECT track.* FROM (SELECT * FROM playlistTrack WHERE playlistID=${id}) AS pTracks JOIN track WHERE pTracks.trackID = track.id;`);
+    if(tracks.error !== undefined) return res.sendStatus(500);
+
+    return res.json(tracks.result);
+  })
 }
 
 exports.addLoggedInRoutes = addLoggedInRoutes;

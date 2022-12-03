@@ -23,7 +23,8 @@ export default function Playlist(props) {
   useEffect(() => { 
     async function fetchData() {
       if(isNaN(id)) return alert("Please enter a number");//figure out why this doesn't return an error with private lists
-      let {result, body} = await fetchWrapper("/api/tracks/" + id);//get set of track
+      let query = props.canEdit && props.loggedIn ? "/api/account/loggedin/tracks/" : "/api/tracks/";
+      let {result, body} = await fetchWrapper(query + id);//get set of track
 
       if(result.ok) {
         setTracks(body);

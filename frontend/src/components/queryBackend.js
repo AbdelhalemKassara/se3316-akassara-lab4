@@ -7,7 +7,7 @@ export async function fetchWrapper(path, init ={}) {
 
   let result = await fetch(path, init);
 
-  if(result.status === 403) {//forbidden
+  if(result.status === 403) {//forbidden (should be 401 but throuly test this after changing)
     let newAccessToken = await fetch('/api/account/accesstoken', {
       method : 'POST',
       headers : {

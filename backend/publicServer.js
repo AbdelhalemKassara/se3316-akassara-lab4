@@ -38,11 +38,10 @@ function addPublicRoutes(playlists, search, router) {
     if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
     
 
-
-    
-    //check if the playlist is private
-
-    
+    let result = await query(`SELECT publicVisibility FROM playlist WHERE id=${id};`);
+    if(result.error !== undefined) return res.sendStatus(500);
+    if(result.result.length == 0) return res.stauts(400).send({error : "This playlist doesn't exist."});
+    if(result.result[0].publicVisibility === 0) return res.status(403).send({error : "This playlist is private."});
 
     let tracks = await query('SELECT track.* FROM (SELECT * FROM playlistTrack WHERE playlistID='+ id + ') AS pTracks JOIN track WHERE pTracks.trackID = track.id;');
     if(tracks.error !== undefined) return res.sendStatus(500);
