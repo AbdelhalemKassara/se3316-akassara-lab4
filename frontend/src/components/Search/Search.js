@@ -5,7 +5,6 @@ import TrackRow from '../TrackRow/TrackRow';
 import './Search.css';
 
 export default function Search() {
-  const searchBar = useRef('');
   const [searchVal, setSearchVal] = useState('');
   const artist = useRef('');
   const track = useRef('');

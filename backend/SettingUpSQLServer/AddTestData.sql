@@ -9,8 +9,15 @@ ALTER TABLE user ADD COLUMN admin BOOLEAN DEFAULT 0;
 
 ##testing stuff
 SELECT * FROM user;
+SELECT * FROM playlist;
+SELECT Count(*) FROM playlistReview;
+#users 69, 70, 71
+#playlists 3,4,7,9
 
-UPDATE user SET disabled=1 WHERE id=68;
+
+INSERT INTO playlistReview (userID, playlistID, rating, review) VALUES (69, 9, 7, 'This is a review of user id 69 the playlist 9 and it isnot very good with the id 4 or something and by user with id 69. here is some extra text sad;lfjads;klksdf;ajfd;sdaffdasafds');
+
+UPDATE playlistReview SET rating=8 WHERE reviewID=10;
 
 UPDATE playlist SET description='this is a description for playlist3 i think' WHERE id=7;
 UPDATE playlist SET publicVisibility=1;
@@ -67,3 +74,28 @@ SELECT t.id, t.artistName, genre.title AS genre FROM (SELECT track.*, trackGenre
 
 SELECT title, artistName FROM track;
 SELECT trackID FROM trackGenres JOIN genre on genre.id = trackGenres.genreID WHERE genre.id = 1;
+
+SELECT playlistReview.*, user.userName FROM playlistReview JOIN user ON user.id=playlistReview.userID WHERE playlistID=7;
+SELECT publicVisibility FROM playlist WHERE id=7;
+SELECT list.*, averageRating FROM (SELECT playlistID, userName, name, dateLastChanged, publicVisibility, description, numOfTracks, duration 
+FROM user JOIN (
+SELECT * FROM playlist LEFT JOIN (
+SELECT COUNT(*) AS numOfTracks, SEC_TO_TIME(SUM(time_to_sec(duration))) AS duration, p.playlistID  
+FROM playlistTrack AS p JOIN track AS t ON t.id = p.trackID GROUP BY p.playlistID) AS a ON a.playlistID = playlist.id 
+WHERE playlist.publicVisibility=1) AS res on res.userID = user.id ORDER BY dateLastChanged DESC LIMIT 10) AS list
+LEFT JOIN (SELECT playlistID, AVG(rating) AS averageRating FROM playlistReview GROUP BY playlistID) AS ratings 
+ON ratings.playlistID=list.playlistID;
+
+SELECT * FROM playlist;
+UPDATE playlist SET publicVisibility=1 WHERE id=11;
+
+SELECT id AS playlistID, userName, name, dateLastChanged, publicVisibility, description, numOfTracks, duration, averageRating FROM 
+(SELECT res.id, userName, name, dateLastChanged, publicVisibility, description, numOfTracks, duration 
+FROM user JOIN (
+SELECT * 
+FROM playlist LEFT JOIN (
+SELECT COUNT(*) AS numOfTracks, SEC_TO_TIME(SUM(time_to_sec(duration))) AS duration, p.playlistID  
+FROM playlistTrack AS p 
+JOIN track AS t ON t.id = p.trackID GROUP BY p.playlistID) AS a ON a.playlistID = playlist.id 
+WHERE playlist.userID=72) AS res on res.userID = user.id ORDER BY dateLastChanged DESC) AS list
+LEFT JOIN (SELECT playlistID, AVG(rating) AS averageRating FROM playlistReview GROUP BY playlistID) AS ratings ON ratings.playlistID=list.id;

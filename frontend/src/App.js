@@ -13,9 +13,11 @@ import ChangePassword from './components/loggedIn/ChangePassword/ChangePassword'
 import jwtDecode from 'jwt-decode';
 import TrackInfo from './components/TrackInfo/TrackInfo';
 import Search from './components/Search/Search';
+import CreatePlaylist from './components/loggedIn/UserPlaylists/CreatePlaylist/CreatePlaylist';
 
 function App() {
   const [publicPlaylists, setPublicPlaylists] = useState([]);
+  const [userPlaylists, setUserPlaylists] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -24,6 +26,18 @@ function App() {
   }
   fetchData();
   }, [])
+
+  useEffect(() => {
+    async function getData() {
+      let {result, body} = await fetchWrapper("/api/account/loggedin/playlists");
+      if(result.ok) {
+        setUserPlaylists(body);
+      } else {
+        alert(body && body.error ? body.error : "There was an issue with getting your playlists.");
+      }
+    }
+    getData();
+  }, []);
 
   const [user, setUser] = useState(() => {
     let token = localStorage.getItem('refreshToken');
@@ -97,12 +111,14 @@ function App() {
             <Route path="signup" element={<SignUp /> } />
           </Route>
 
-          <Route path="/playlist/:id" element={<Playlist publicPlaylists={publicPlaylists}/>} />
+          <Route path="/playlist/:id" element={<Playlist playlists={publicPlaylists} canEdit={false} loggedIn={localStorage.getItem('refreshToken') !== null}/>} />
           <Route path="/track/:id" element={<TrackInfo />} />
           <Route path='/search' element={<Search />} />
           
           <Route path='/loggedin'> 
-            <Route path="playlists" element={<UserPlaylists />} />
+            <Route path="playlists" element={<UserPlaylists userPlaylists={userPlaylists}/>} />
+            <Route path="playlist/:id" element={<Playlist playlists={userPlaylists} canEdit={true} loggedIn={localStorage.getItem('refreshToken') !== null}/>} />
+            <Route path="playlists/create" element={<CreatePlaylist />} />
             <Route path="changepassword" element={<ChangePassword onChangePassword={changePassword}/>} />
             <Route path="playlistReview" element={<PlaylistReview />} />
           </Route>

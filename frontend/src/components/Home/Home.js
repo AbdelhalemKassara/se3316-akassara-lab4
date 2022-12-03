@@ -18,7 +18,12 @@ export default function Home(props) {
   <>
   <p>{aboutMessage}</p>
   <div className="preview-public-playlists">
-    {props.publicPlaylists.map((list) => (<PlaylistIcon key={list.playlistID} id={list.playlistID} playlistName={list.name} tracksCount={list.numOfTracks} playTime={list.duration} rating={0} dateLastChanged={list.dateLastChanged} user={list.userName}/>))}
+    {props.publicPlaylists.map((list) => (<PlaylistIcon 
+    key={list.playlistID} id={list.playlistID} 
+    playlistName={list.name} tracksCount={list.numOfTracks} 
+    playTime={list.duration} rating={list.averageRating} 
+    dateLastChanged={list.dateLastChanged} user={list.userName}
+    url={'/playlist/'}/>))}
   </div>
   </>);
 }

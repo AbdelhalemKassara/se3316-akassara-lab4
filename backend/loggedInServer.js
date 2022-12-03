@@ -9,8 +9,21 @@ function addLoggedInRoutes(user) {
   });
   
   user.get('/playlists', async (req, res) => {
-  
-    res.json(await query("SELECT * FROM playlist WHERE userID='" + req.user.id + "';"));
+    //same thing as long query in the public server but not limiting the results by 10 and checking for user id
+    let result = await query(`SELECT id AS playlistID, userName, name, dateLastChanged, publicVisibility, description, numOfTracks, duration, averageRating FROM 
+    (SELECT res.id, userName, name, dateLastChanged, publicVisibility, description, numOfTracks, duration 
+    FROM user JOIN (
+    SELECT * 
+    FROM playlist LEFT JOIN (
+    SELECT COUNT(*) AS numOfTracks, SEC_TO_TIME(SUM(time_to_sec(duration))) AS duration, p.playlistID  
+    FROM playlistTrack AS p 
+    JOIN track AS t ON t.id = p.trackID GROUP BY p.playlistID) AS a ON a.playlistID = playlist.id 
+    WHERE playlist.userID=${req.user.id}) AS res on res.userID = user.id ORDER BY dateLastChanged DESC) AS list
+    LEFT JOIN (SELECT playlistID, AVG(rating) AS averageRating FROM playlistReview GROUP BY playlistID) AS ratings ON ratings.playlistID=list.id;
+    `);
+    if(result.error !== undefined) return res.sendStatus(500);
+
+    res.json(result.result);
   });
   
   user.post('/createPlaylist', async(req, res) => {
@@ -27,7 +40,21 @@ function addLoggedInRoutes(user) {
 
     return res.sendStatus(201);
   });
-  
+  user.get('/playlist/reviews/:id', async (req, res) => {
+    let id = req.params.id;
+    if(isNaN(id)) return res.status(400).send({error : "Please enter a number as playlist id"});
+    
+    //check if the playlist is public
+    let result = await query("SELECT userID FROM playlist WHERE id="+ id + ';');
+    if(result.error !== undefined) return res.sendStatus(500);
+    if(result.result.length == 0) return res.status(404).json({error : "This playlist doesn't exist."});
+    if(result.result[0].userID !== req.user.id) return res.status(403).json({error : "This playlist is owned by another user."});
+
+    result = await query("SELECT playlistReview.*, user.userName FROM playlistReview JOIN user ON user.id=playlistReview.userID WHERE playlistID=" + id + ";");
+    if(result.error !== undefined) return res.sendStatus(500);
+    
+    return res.status(200).json(result.result);
+  });
   //this updates the user's password
   user.put('/changepassword',checkPasswordFormat, async (req, res) => {
     //update password

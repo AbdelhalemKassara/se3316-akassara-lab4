@@ -9,13 +9,19 @@ function addPublicRoutes(playlists, search, router) {
   });
   //sends information about all the playlists
   router.get('/playlists', async (req, res) => {
+    //this returns null for playlist id that don't have an tracks
     //this thing returns all the public playlist and gets their duration and number of tracks and gets the 10 most recently changed playlists
-    let publicPlaylists = await query(`SELECT playlistID, userName, name, dateLastChanged, publicVisibility, description, numOfTracks, duration 
+    let publicPlaylists = await query(`SELECT id AS playlistID, userName, name, dateLastChanged, publicVisibility, description, numOfTracks, duration, averageRating FROM 
+    (SELECT res.id, userName, name, dateLastChanged, publicVisibility, description, numOfTracks, duration 
     FROM user JOIN (
-    SELECT * FROM playlist LEFT JOIN (
+    SELECT * 
+    FROM playlist LEFT JOIN (
     SELECT COUNT(*) AS numOfTracks, SEC_TO_TIME(SUM(time_to_sec(duration))) AS duration, p.playlistID  
-    FROM playlistTrack AS p JOIN track AS t ON t.id = p.trackID GROUP BY p.playlistID) AS a ON a.playlistID = playlist.id 
-    WHERE playlist.publicVisibility=1) AS res on res.userID = user.id ORDER BY dateLastChanged DESC LIMIT 10;`);
+    FROM playlistTrack AS p 
+    JOIN track AS t ON t.id = p.trackID GROUP BY p.playlistID) AS a ON a.playlistID = playlist.id 
+    WHERE playlist.publicVisibility=1) AS res on res.userID = user.id ORDER BY dateLastChanged DESC LIMIT 10) AS list
+    LEFT JOIN (SELECT playlistID, AVG(rating) AS averageRating FROM playlistReview GROUP BY playlistID) AS ratings ON ratings.playlistID=list.id;
+    `);
 
     if(publicPlaylists.error !== undefined) return res.status(500).send();
 
@@ -30,6 +36,13 @@ function addPublicRoutes(playlists, search, router) {
   router.get('/tracks/:playlistId', async (req, res) => {
     let id = req.params.playlistId;
     if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
+    
+
+
+    
+    //check if the playlist is private
+
+    
 
     let tracks = await query('SELECT track.* FROM (SELECT * FROM playlistTrack WHERE playlistID='+ id + ') AS pTracks JOIN track WHERE pTracks.trackID = track.id;');
     if(tracks.error !== undefined) return res.sendStatus(500);
@@ -156,6 +169,22 @@ function addPublicRoutes(playlists, search, router) {
       }
     }  
   });
+
+  router.get('/playlist/reviews/:id', async (req,res) => {
+    let id = req.params.id;
+    if(isNaN(id)) return res.status(400).send({error : "Please enter a number as playlist id"});
+    
+    //check if the playlist is public
+    let result = await query("SELECT publicVisibility FROM playlist WHERE id="+ id + ';');
+    if(result.error !== undefined) return res.sendStatus(500);
+    if(result.result.length == 0) return res.status(404).json({error : "This playlist doesn't exist."});
+    if(result.result[0].publicVisibility == 0) return res.status(403).json({error : "This playlist is private."});
+
+    result = await query("SELECT playlistReview.*, user.userName FROM playlistReview JOIN user ON user.id=playlistReview.userID WHERE playlistID=" + id + ";");
+    if(result.error !== undefined) return res.sendStatus(500);
+    
+    return res.status(200).json(result.result);
+  })
   router.get('/artist/:id', (req, res) => {
   });
   router.get('/album/:id', (req, res) => {
