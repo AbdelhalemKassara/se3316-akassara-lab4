@@ -7,9 +7,11 @@ ALTER TABLE playlist ADD CONSTRAINT unique_playlistName_With_userID UNIQUE (user
 
 ALTER TABLE user ADD COLUMN admin BOOLEAN DEFAULT 0;
 
+ALTER TABLE playlistReview ADD COLUMN disabled BOOLEAN DEFAULT 0;
+
 ##testing stuff
 SELECT * FROM user;
-SELECT * FROM playlistTrack WHERE playlistID=10;
+SELECT EXISTS (SELECT * FROM playlistTrack WHERE playlistID=14) AS 'exists';
 SELECT * FROM track;
 INSERT INTO playlistTrack (playlistID, trackID) VALUES (10, 274);
 SELECT * FROM playlist WHERE id=18;

@@ -67,7 +67,7 @@ function addAuthentication(userCred) {
         if(!user.verifiedEmail) return res.status(403).json({verificationLink : req.protocol + "://" + req.get('host') + '/api/account/verification/' + await generateAccountVerificationToken(user)});
         
         //the user exists
-        const passUser = {id : user.id, email : user.email, userName : user.userName};
+        const passUser = {id : user.id, email : user.email, userName : user.userName, admin : user.admin};
 
         const accessToken = await generateAccessToken(passUser);
         const refreshToken = await generateRefreshToken(passUser);
@@ -127,7 +127,7 @@ function addAuthentication(userCred) {
       let result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ user.jti + "') AS bool;");
       if(result.result[0].bool == 1) return res.sendStatus(403)//check if we have the token
     
-      const accessToken = await generateAccessToken({id : user.id, email : user.email, userName : user.userName});//get an access token
+      const accessToken = await generateAccessToken({id : user.id, email : user.email, userName : user.userName, admin : user.admin});//get an access token
       return res.json({accessToken : accessToken});
     })
   })
@@ -193,6 +193,6 @@ async function generateToken(SECRET, expiration, user) {
     id = crypto.randomBytes(16).toString('hex');
     result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ id + "') AS bool;");  
   }
-  let userDetails = {id : user.id, email : user.email, userName : user.userName};
+  let userDetails = {id : user.id, email : user.email, userName : user.userName, admin : user.admin};
   return jwt.sign(userDetails, SECRET, {expiresIn : expiration, jwtid: id});
 }

@@ -123,7 +123,9 @@ function App() {
             <Route path="playlistReview" element={<PlaylistReview />} />
           </Route>
   
+          <Route path='/admin'>
 
+          </Route>
           <Route path="*" element={<p>404 Not Found</p>} />
         </Routes>
       </div>

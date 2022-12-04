@@ -40,11 +40,6 @@ export default function CreatePlaylist(props) {
   }, [props.userPlaylists]);
 
   async function updatePlaylist() {
-    console.log(playlistName);
-    console.log(playlistID);
-    console.log(description);
-    console.log(tracks);
-    console.log(publicVisibility);
     const {result, body} = await fetchWrapper('/api/account/loggedin/playlist/update/' + playlistID, {
       method : 'PUT', 
       headers : {
