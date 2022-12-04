@@ -21,6 +21,7 @@ export default function UserWindow(props) {
         <Link className={props.isAdmin ? 'Nav-Bar-Item admin' : 'Nav-Bar-Item'} id="User" onClick={toggleState}>{props.userName}</Link>
             <div id="user-window"> 
             <Link to='/loggedin/changepassword' onClick={toggleState}>Change Password</Link>
+            <Link to='/admin/view/users' onClick={toggleState}>View Users</Link>
             <Link to='/loggedin/playlists' onClick={toggleState}>Playlists</Link>
             <Link onClick={() => {props.onLogout()}}>Log out</Link>
             </div>
