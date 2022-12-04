@@ -29,8 +29,10 @@ function addLoggedInRoutes(user) {
   
   user.post('/createPlaylist', async(req, res) => {
     let playlistName = req.body.name;
-    if(playlistName === undefined || playlistName === null || playlistName === '') return res.status(400).send("playlist name is invalid");
-    
+    if(playlistName === undefined || playlistName === null || playlistName === '') return res.status(400).json({error : "please enter a playlist name."});
+    if(typeof playlistName !== 'string' && !(playlistName instanceof String)) return res.status(400).json({error : "Please enter the playlist name as a string."})
+    if(playlistName.length > 300) return res.status(400).json({error : "Playlist name is too long."});
+
     //check if the name already exists
     let result = await query("SELECT Count(*) AS count FROM playlist WHERE userID='" + req.user.id + "' AND name='" + playlistName + "' LIMIT 1;") 
     if(result.error !== undefined) return res.status(500).send();
@@ -101,26 +103,29 @@ function addLoggedInRoutes(user) {
     if(typeof description !== 'string' && !(description instanceof String)) return res.status(400).json({error : "Please enter a playlist details as a string."});
     if(Array.isArray(tracks) && tracks.some((track) => isNaN(track))) return res.status(400).json({error : "Please enter the tracks as an array of numbers."});
     if(publicVisibility !== 0 && publicVisibility !== 1) return res.status(400).json({error : "Please enter either 1 or 0 as the public visibility."});
+
+    if(name.length > 300) return res.status(400).json({error : "Playlist name is too long."});
+    if(description.length > 1000) return res.status(400).json({error : "Description is too long."});
     
     if(tracks.length !== 0) {
       let {result, error} = await query(`SELECT COUNT(*) AS count FROM track WHERE id IN (?);`, tracks);
-      if(error !== undefined) {console.log("1"); return res.sendStatus(500);}
+      if(error !== undefined) return res.sendStatus(500);
       if(result && result[0] && result[0].count !== tracks.length) return res.status(400).json({error : "There are some track id's that don't exists."});
     } 
 
     //updates playlist
     let result = await query(`UPDATE playlist SET publicVisibility=${publicVisibility}, name='${name}', description='${description}', dateLastChanged='${CurSQLDate()}' WHERE id=${id}`);
-    if(result.error !== undefined) {console.log("2");return res.sendStatus(500);}
+    if(result.error !== undefined) return res.sendStatus(500);
 
     //deletes all tracks from playlist
     result = await query(`DELETE FROM playlistTrack WHERE playlistID=${id}`);
-    if(result.error !== undefined) {console.log("3");return res.sendStatus(500);}
+    if(result.error !== undefined) return res.sendStatus(500);
 
     //add the tracks that were passed in
     if(tracks.length !== 0) {
       const listTracks = tracks.map((trackID) => [id, trackID]);
       result = await query(`INSERT INTO playlistTrack (playlistID, trackID) VALUES ?`, listTracks);
-      if(result.error !== undefined) {console.log("4");return res.sendStatus(500);}
+      if(result.error !== undefined) return res.sendStatus(500);
     }
    
     return res.sendStatus(201);
@@ -133,6 +138,7 @@ function addLoggedInRoutes(user) {
 
     if(isNaN(rating) && (rating < 0 || rating > 10)) return res.status(400).json({error : "Please enter a number for the rating that is from 0 to 10."});
     if(typeof review !== 'string' && !(review instanceof String)) return res.status(400).json({error : "Please enter the review as astring."});
+    if(review.length > 1000) return res.status(400).json({error : "The review is too long."});
 
     //check if user already reviewd a playlist
     let result = await query(`SELECT EXISTS(SELECT * FROM playlistReview WHERE playlistID=${playlistID} AND userID=${userID}) AS 'exists';`);
@@ -146,20 +152,8 @@ function addLoggedInRoutes(user) {
   });
 }
 
-/*
-{
-    "playlistID": 14,
-    "userName": "password is create",
-    "name": "test",
-    "dateLastChanged": "2022-12-03T03:03:46.000Z",
-    "publicVisibility": 0,
-    "description": null,
-    "numOfTracks": null,
-    "duration": null,
-    "averageRating": null
-  },
-*/
 exports.addLoggedInRoutes = addLoggedInRoutes;
+
 async function checkPlaylistAndUserNotMatch(req, res, next) {
   let id = req.params.id;
 

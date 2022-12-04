@@ -160,6 +160,7 @@ function checkEmailFormat(req, res, next) {
   if(!email.includes('@')) return res.status(400).json({error : "this email doesn't contain a @ symbol"});
   if(email.split('@')[0].length === 0) return res.status(400).json({error : "this email doesn't contain a prefix"});
   if(email.includes('..') || !(/.\../.test(email.split('@')[1]))) return res.status(400).json({error : "this email doesn't contain a valid domian"}); //checks if there are two dots next to eachother and if the email's dots have text on either side
+  if(emal.length > 320) return res.status(400).json({error : "This email is too long."});
   
   next();
 }
