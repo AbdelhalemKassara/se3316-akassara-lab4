@@ -7,7 +7,7 @@ export async function fetchWrapper(path, init ={}) {
 
   let result = await fetch(path, init);
 
-  if(result.status === 403) {//forbidden (should be 401 but throuly test this after changing)
+  if(result.status === 401) {//forbidden (should be 401 but throuly test this after changing) was 403
     let newAccessToken = await fetch('/api/account/accesstoken', {
       method : 'POST',
       headers : {
@@ -21,7 +21,7 @@ export async function fetchWrapper(path, init ={}) {
 
       return fetchWrapper(path, init);//try again
 
-    } else if(newAccessToken.status === 403) {
+    } else if(newAccessToken.status === 401) {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('accessToken');
 

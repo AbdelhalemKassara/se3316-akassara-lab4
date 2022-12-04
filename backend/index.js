@@ -59,7 +59,8 @@ function authenticateToken(req, res, next) {
   if(token == null) return res.sendStatus(401);
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if(err) return res.status(403).json({accessLevel : 'logged in user'});//token is invalid
+    if(err) return res.status(401).json({accessLevel : 'logged in user'});//token is invalid
+
     //the token is valid
 
     req.user = user;

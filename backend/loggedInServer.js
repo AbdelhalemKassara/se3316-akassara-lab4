@@ -32,8 +32,13 @@ function addLoggedInRoutes(user) {
     
     //check if the name already exists
     let result = await query("SELECT Count(*) AS count FROM playlist WHERE userID='" + req.user.id + "' AND name='" + playlistName + "' LIMIT 1;") 
-    if(result.error !== undefined) {console.log(result.error);return res.status(500).send();}
-    if(result.result[0].count > 0) return res.status(400).send("This playlist already exists");
+    if(result.error !== undefined) return res.status(500).send();
+    if(result.result[0].count > 0) return res.status(400).json({error : "This playlist already exists"});
+
+    //check if the user already added max amount of playlists
+    result = await query(`SELECT COUNT(*) AS count FROM playlist WHERE userID=${req.user.id};`);
+    if(result.error !== undefined || !result.result || !result.result[0]) return res.status(500).send();
+    if(result.result[0].count >= 20) return res.status(400).json({error : "You already have the maximum number of playlists."})
 
     result = await query("INSERT INTO playlist (name, userID, dateLastChanged, publicVisibility) VALUES ?", [[req.body.name, req.user.id, CurSQLDate(), false]]);
     if(result.error !== undefined) return res.status(500).send();
@@ -62,34 +67,47 @@ function addLoggedInRoutes(user) {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       
       let result = await query("UPDATE user SET password='"+ hashedPassword + "' WHERE id=" + req.user.id + ";")
-      if(result.error !== undefined) {console.log(result.error); return res.status(500).send()};
+      if(result.error !== undefined) return res.status(500).send();
 
       return res.sendStatus(204);
     } catch (e){
-      console.log(e);
       return res.sendStatus(500);
     }
   });
 
-  user.get('/tracks/:playlistID', async (req, res) => {
-    let id = req.params.playlistID;
-    if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
-    
-    let result = await query(`SELECT userID FROM playlist WHERE id=${id};`);
-    if(result.error !== undefined) return res.sendStatus(500);
-    if(result.result.length == 0) return res.stauts(400).send({error : "This playlist doesn't exist."});
-    if(result.result[0].userID !== req.user.id) return res.status(403).send({error : "This playlist is owned by another user."})
-    
+  user.get('/tracks/:id', checkPlaylistAndUserMatch, async (req, res) => {
+    let id = req.params.id;
+
     let tracks = await query(`SELECT track.* FROM (SELECT * FROM playlistTrack WHERE playlistID=${id}) AS pTracks JOIN track WHERE pTracks.trackID = track.id;`);
     if(tracks.error !== undefined) return res.sendStatus(500);
 
     return res.json(tracks.result);
-  })
+  });
+
+  user.put('/playlist/delete/:id', (req, res) => {
+    
+  });
+
+  user.put('/playlist/update/:id', (req, res) => {
+    //check if the user created the playlist
+    //check if all the tracks are valid tracks
+    //check if 
+  });
 }
 
 exports.addLoggedInRoutes = addLoggedInRoutes;
 
+async function checkPlaylistAndUserMatch(req, res, next) {
+  let id = req.params.id;
 
+  if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
+
+  let result = await query(`SELECT userID FROM playlist WHERE id=${req.params.id}`);
+  if(result.error !== undefined) return res.sendStatus(500);
+  if(!result.result || !result.result[0] || !result.result[0].userID) return res.status(400).json({error : "This playlist doesn't exit"})
+  if(result.result[0].userID !== req.user.id) return res.status(403).send({error : "This playlist is owned by another user"});
+  next();
+}
 function checkPasswordFormat(req, res, next) {
   let user = req.body;
 

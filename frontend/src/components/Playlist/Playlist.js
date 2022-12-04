@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { fetchWrapper } from '../queryBackend';
 import TrackRow from '../TrackRow/TrackRow';
 import './Playlist.css';
@@ -30,14 +30,12 @@ export default function Playlist(props) {
         setTracks(body);
 
       } else {
-        alert("There was an issue with getting the tracks");
+        alert(body && body.error ? body.error : "There was an issue with getting the tracks");
       }
     }
     fetchData();
   }, []);
-  
-  //props.userLoggedIn
-  
+    
   useEffect(() => {
     let list = props.playlists.find((list) => list.playlistID == id);
     if(list !== undefined) {
@@ -56,7 +54,7 @@ export default function Playlist(props) {
   return (<>
     <div className="playlist-info">
       <button onClick={() => navigate(-1)}>Go Back</button>
-      {props.loggedIn && props.canEdit? <button>Edit</button> : <></>}
+      {props.loggedIn && props.canEdit? <Link to={'/loggedin/playlist/edit/' + id}><button>Edit</button></Link> : <></>}
       <br/>
       <p>Description: <span>{description}</span></p>
       <br/>
@@ -77,7 +75,7 @@ export default function Playlist(props) {
       duration={track.duration} 
       title={track.title}
       albumName={track.albumName}
-      header={false}/>))}
+      header={false} canEdit={false}/>))}
     </div>
     <br/>
     <PlaylistReviews id={playlistID} canEdit={props.canEdit} loggedIn={props.loggedIn}/>

@@ -9,6 +9,9 @@ ALTER TABLE user ADD COLUMN admin BOOLEAN DEFAULT 0;
 
 ##testing stuff
 SELECT * FROM user;
+SELECT * FROM playlistTrack WHERE playlistID=10;
+SELECT * FROM track;
+INSERT INTO playlistTrack (playlistID, trackID) VALUES (10, 274);
 SELECT * FROM playlist;
 SELECT Count(*) FROM playlistReview;
 #users 69, 70, 71

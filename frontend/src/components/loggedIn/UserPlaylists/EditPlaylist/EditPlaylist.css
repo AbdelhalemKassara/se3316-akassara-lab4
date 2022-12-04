@@ -1,0 +1,15 @@
+.edit-top-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.lables {
+  display: inline-block;
+  padding-right: 10px;
+}
+
+.description-input {
+  resize: both;  
+
+}

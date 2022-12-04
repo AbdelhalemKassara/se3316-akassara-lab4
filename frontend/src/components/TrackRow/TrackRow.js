@@ -5,7 +5,7 @@ export default function TrackRow(props) {
   const [artist, setArtist] = useState('');
   const [duration, setDuration] = useState('');
   const [title, setTitle] = useState('');
-  const [id, setId] = useState('');
+  const [id, setId] = useState(-1);
   const [album, setAlbum] = useState('');
 
   useEffect(() => {
@@ -17,6 +17,7 @@ export default function TrackRow(props) {
   },[props])
   if(props.header) {
     return (<>
+      {props.canEdit ? (<div className="table-lable"><p>Delete</p></div>) : (<></>)}
       <div className="table-lable"><p>Play</p></div>
       <div className="table-lable"><p>Title</p></div>
       <div className="table-lable"><p>Album</p></div>
@@ -26,7 +27,8 @@ export default function TrackRow(props) {
       </>);
   } else {
     return (<>
-      <div className="data-lable-st"><a href={"https://www.youtube.com/results?search_query=" + title + ' by ' + artist} target="_blank">youtube</a></div>
+      {props.canEdit ? (<div className="data-lable-st"><button onClick={() => props.onDeleteTrack(id)}>Delete</button></div>) : (<></>)}
+      <div className={props.canEdit ? 'data-lable':'data-lable-st'}><a href={"https://www.youtube.com/results?search_query=" + title + ' by ' + artist} target="_blank">youtube</a></div>
       <div className="data-lable"><p>{title}</p></div>
       <div className="data-lable"><p>{album}</p></div>
       <div className="data-lable"><p>{artist}</p></div>

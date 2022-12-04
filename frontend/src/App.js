@@ -13,32 +13,11 @@ import ChangePassword from './components/loggedIn/ChangePassword/ChangePassword'
 import jwtDecode from 'jwt-decode';
 import TrackInfo from './components/TrackInfo/TrackInfo';
 import Search from './components/Search/Search';
-import CreatePlaylist from './components/loggedIn/UserPlaylists/CreatePlaylist/CreatePlaylist';
+import EditPlaylist from './components/loggedIn/UserPlaylists/EditPlaylist/EditPlaylist';
 
 function App() {
   const [publicPlaylists, setPublicPlaylists] = useState([]);
   const [userPlaylists, setUserPlaylists] = useState([]);
-
-  useEffect(() => {
-    async function fetchData() {
-    let {body} = await fetchWrapper('/api/playlists');
-    setPublicPlaylists(body);
-  }
-  fetchData();
-  }, [])
-
-  useEffect(() => {
-    async function getData() {
-      let {result, body} = await fetchWrapper("/api/account/loggedin/playlists");
-      if(result.ok) {
-        setUserPlaylists(body);
-      } else {
-        alert(body && body.error ? body.error : "There was an issue with getting your playlists.");
-      }
-    }
-    getData();
-  }, []);
-
   const [user, setUser] = useState(() => {
     let token = localStorage.getItem('refreshToken');
     if(token) {
@@ -47,7 +26,28 @@ function App() {
       return {};
     }
   });
+  const updateUserPlaylists = async () => {
+    let {result, body} = await fetchWrapper("/api/account/loggedin/playlists");
+    if(result.ok) {
+      setUserPlaylists(body);
+    } else {
+      alert(body && body.error ? body.error : "There was an issue with getting your playlists.");
+    }
+  }
+  useEffect(() => {
+    async function fetchData() {
+      let {body} = await fetchWrapper('/api/playlists');
+      setPublicPlaylists(body);
+    }
+    fetchData();
 
+    if(user.id) {
+      updateUserPlaylists();
+    }
+  }, [user])
+
+  
+  
   const loginUser = async (email, password) => {
     let result = await fetch('/api/account/login', {
       method : 'POST',
@@ -116,9 +116,9 @@ function App() {
           <Route path='/search' element={<Search />} />
           
           <Route path='/loggedin'> 
+            <Route path="playlist/edit/:id" element={<EditPlaylist userPlaylists={userPlaylists} onUpdateUserPlaylists={updateUserPlaylists}/>}/>
             <Route path="playlists" element={<UserPlaylists userPlaylists={userPlaylists}/>} />
             <Route path="playlist/:id" element={<Playlist playlists={userPlaylists} canEdit={true} loggedIn={localStorage.getItem('refreshToken') !== null}/>} />
-            <Route path="playlists/create" element={<CreatePlaylist />} />
             <Route path="changepassword" element={<ChangePassword onChangePassword={changePassword}/>} />
             <Route path="playlistReview" element={<PlaylistReview />} />
           </Route>
