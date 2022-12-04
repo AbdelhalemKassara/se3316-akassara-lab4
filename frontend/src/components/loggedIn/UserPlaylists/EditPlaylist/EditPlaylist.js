@@ -1,21 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchWrapper } from '../../../queryBackend';
 import './EditPlaylist.css';
-import TrackRow
- from '../../../TrackRow/TrackRow';
+import TrackRow from '../../../TrackRow/TrackRow';
+
 export default function CreatePlaylist(props) {
   const { id } = useParams();
   const [tracks, setTracks] = useState([]);
-
+  const navigate = useNavigate();
   const [description, setDescription] = useState('');
   const [playlistName, setPlaylistName] = useState('');
-  const [userName, setUserName] = useState('');
-  const [numOfTracks, setNumOfTracks] = useState(0);
-  const [duration, setDuration] = useState('');
   const [publicVisibility, setPublicVisibility] = useState(0);
-  const [rating, setRating] = useState(0);
-  const [dateLastChanged, setDateLastChanged] = useState();
   const [playlistID, setPlaylistID] = useState();
 
   const addTrack = useRef();
@@ -39,24 +34,50 @@ export default function CreatePlaylist(props) {
     if(list !== undefined) {
       setPlaylistID(list.playlistID);
       setPlaylistName(list.name);
-      setUserName(list.userName);
-      setNumOfTracks(list.numOfTracks);
-      setDuration(list.duration);
       setPublicVisibility(list.publicVisibility);
-      setRating(list.averageRating);
-      setDateLastChanged(list.dateLastChanged);
       setDescription(list.description == null ? '' : list.description);
     }
   }, [props.userPlaylists]);
 
   async function updatePlaylist() {
-
-    props.onUpdateUserPlaylists();
-    getTracks();
+    console.log(playlistName);
+    console.log(playlistID);
+    console.log(description);
+    console.log(tracks);
+    console.log(publicVisibility);
+    const {result, body} = await fetchWrapper('/api/account/loggedin/playlist/update/' + playlistID, {
+      method : 'PUT', 
+      headers : {
+        "Content-Type" : 'application/json'
+      },
+      body : JSON.stringify({
+        name : playlistName,
+        description : description,
+        tracks : tracks.map((track) => track.id),
+        publicVisibility : publicVisibility
+      })
+    });
+    
+    if(result.ok) {
+      props.onUpdateUserPlaylists();
+      getTracks();  
+    } else {
+      alert(body && body.error ? body.error : "There was an issue with updating the playlist.");
+    }
   }
   
   async function deletePlaylist() {
     console.log(playlistID);
+    if(window.confirm('Are you sure that you want to delete this playlist?')) {
+      let {result, body} = await fetchWrapper("/api/account/loggedin/playlist/delete/" + playlistID, {method : 'DELETE'});
+      
+      if(result.ok) {
+        alert("The playlist has been deleted.");
+        navigate('/loggedin/playlists');
+      } else {
+        alert(body && body.error ? body.error : "There was an issue with deleting the playlist.");
+      }
+    }
   }
 
   async function getNewTrack() {//only gets the track

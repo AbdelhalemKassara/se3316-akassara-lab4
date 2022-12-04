@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Outlet, Route, Routes } from 'react-router-dom';
 import Home from './components/Home/Home';
 import LogIn from './components/LogIn/LogIn';
 import SignUp from './components/SignUp/SignUp';
@@ -101,7 +101,7 @@ function App() {
   
   return (
     <>
-      <NavBar user={user.email} userName={user.userName} onLogout={logOutUser}/>
+      <NavBar userName={user.userName} onLogout={logOutUser}/>
       <div id="main-content">
         <Routes>
           <Route path="/" element={<Home publicPlaylists={publicPlaylists}/>} />
@@ -115,7 +115,7 @@ function App() {
           <Route path="/track/:id" element={<TrackInfo />} />
           <Route path='/search' element={<Search />} />
           
-          <Route path='/loggedin'> 
+          <Route path='/loggedin' element={user.id ? <Outlet/> :<LogIn onLogin={loginUser}/>}> 
             <Route path="playlist/edit/:id" element={<EditPlaylist userPlaylists={userPlaylists} onUpdateUserPlaylists={updateUserPlaylists}/>}/>
             <Route path="playlists" element={<UserPlaylists userPlaylists={userPlaylists}/>} />
             <Route path="playlist/:id" element={<Playlist playlists={userPlaylists} canEdit={true} loggedIn={localStorage.getItem('refreshToken') !== null}/>} />

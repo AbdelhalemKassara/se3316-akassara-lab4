@@ -1,6 +1,7 @@
 const {query, startDatabaseConnection, UTCtoSQLDate, CurSQLDate} = require('./databaseConnection');
 const bcrypt = require('bcrypt');
 
+
 function addLoggedInRoutes(user) {
   user.get('/getUserOnlyStuff', async (req, res) => {
     let user = await query("SELECT id FROM user WHERE email='"+req.user.email+"';");
@@ -84,17 +85,61 @@ function addLoggedInRoutes(user) {
     return res.json(tracks.result);
   });
 
-  user.put('/playlist/delete/:id', (req, res) => {
-    
+  user.delete('/playlist/delete/:id',checkPlaylistAndUserMatch, async (req, res) => {
+    let result = await query(`DELETE FROM playlist WHERE id=${req.params.id};`);
+    if(result.error !== undefined) return res.sendStatus(500);  
+
+    return res.sendStatus(200);
   });
 
-  user.put('/playlist/update/:id', (req, res) => {
-    //check if the user created the playlist
+  user.put('/playlist/update/:id', checkPlaylistAndUserMatch, async (req, res) => {
     //check if all the tracks are valid tracks
-    //check if 
+    const {name, description, tracks, publicVisibility} = req.body;
+    const id = req.params.id;
+
+    if(typeof name !== 'string' && !(name instanceof String)) return res.status(400).json({error : "Please enter a playlist name as a string."});
+    if(typeof description !== 'string' && !(description instanceof String)) return res.status(400).json({error : "Please enter a playlist details as a string."});
+    if(Array.isArray(tracks) && tracks.some((track) => isNaN(track))) return res.status(400).json({error : "Please enter the tracks as an array of numbers."});
+    if(publicVisibility !== 0 && publicVisibility !== 1) return res.status(400).json({error : "Please enter either 1 or 0 as the public visibility."});
+    
+    if(tracks.length !== 0) {
+      let {result, error} = await query(`SELECT COUNT(*) AS count FROM track WHERE id IN (?);`, tracks);
+      if(error !== undefined) {console.log("1"); return res.sendStatus(500);}
+      if(result && result[0] && result[0].count !== tracks.length) return res.status(400).json({error : "There are some track id's that don't exists."});
+    } 
+
+    //updates playlist
+    let result = await query(`UPDATE playlist SET publicVisibility=${publicVisibility}, name='${name}', description='${description}', dateLastChanged='${CurSQLDate()}' WHERE id=${id}`);
+    if(result.error !== undefined) {console.log("2");return res.sendStatus(500);}
+
+    //deletes all tracks from playlist
+    result = await query(`DELETE FROM playlistTrack WHERE playlistID=${id}`);
+    if(result.error !== undefined) {console.log("3");return res.sendStatus(500);}
+
+    //add the tracks that were passed in
+    if(tracks.length !== 0) {
+      const listTracks = tracks.map((trackID) => [id, trackID]);
+      result = await query(`INSERT INTO playlistTrack (playlistID, trackID) VALUES ?`, listTracks);
+      if(result.error !== undefined) {console.log("4");return res.sendStatus(500);}
+    }
+   
+    return res.sendStatus(201);
   });
 }
 
+/*
+{
+    "playlistID": 14,
+    "userName": "password is create",
+    "name": "test",
+    "dateLastChanged": "2022-12-03T03:03:46.000Z",
+    "publicVisibility": 0,
+    "description": null,
+    "numOfTracks": null,
+    "duration": null,
+    "averageRating": null
+  },
+*/
 exports.addLoggedInRoutes = addLoggedInRoutes;
 
 async function checkPlaylistAndUserMatch(req, res, next) {

@@ -12,7 +12,7 @@ SELECT * FROM user;
 SELECT * FROM playlistTrack WHERE playlistID=10;
 SELECT * FROM track;
 INSERT INTO playlistTrack (playlistID, trackID) VALUES (10, 274);
-SELECT * FROM playlist;
+SELECT * FROM playlist WHERE id=18;
 SELECT Count(*) FROM playlistReview;
 #users 69, 70, 71
 #playlists 3,4,7,9
@@ -45,7 +45,6 @@ WHERE playlist.publicVisibility=1) AS res on res.userID = user.id ORDER BY dateL
 
 
 SELECT track.* FROM (SELECT * FROM playlistTrack WHERE playlistID=7) AS pTracks JOIN track WHERE pTracks.trackID = track.id;
-
 
 SELECT id,title AS trackTitle FROM track;
 SELECT id,artistName FROM track; #should be unique
