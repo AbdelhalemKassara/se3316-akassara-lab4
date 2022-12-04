@@ -27,7 +27,7 @@ export async function fetchWrapper(path, init ={}) {
 
       window.location.reload();//refresh
       alert('You need to be logged in to do this query');
-    } 
+    }
   }
   return {result : result, body : await getBody(result)};
 }

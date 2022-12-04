@@ -12,7 +12,7 @@ export default function NavBar(props) {
       <Link to="/" className="Nav-Bar-Item" id="Home">Home</Link>
       <Link to="/Genres" className="Nav-Bar-Item" id="Genres">Genres</Link>
       <Link to="/Search" className="Nav-Bar-Item" id="Search">Search</Link>
-      <UserWindow userName={props.userName} onLogout={props.onLogout}/>
+      <UserWindow userName={props.userName} onLogout={props.onLogout} isAdmin={props.isAdmin}/>
     </div>
   );
 }

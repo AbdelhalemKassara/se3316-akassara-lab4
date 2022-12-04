@@ -2,11 +2,11 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const {startDatabaseConnection} = require('./databaseConnection');
+const {startDatabaseConnection, query} = require('./databaseConnection');
 const {addAuthentication} = require('./autenticationServer');
 const {addLoggedInRoutes} = require('./loggedInServer');
 const {addPublicRoutes} = require('./publicServer');
-
+const {addAdminRoutes} = require('./AdminRoutes');
 const app = express();
 const port = 3000;
 
@@ -14,6 +14,7 @@ const router = express.Router();
 const playlists = express.Router();
 const search = express.Router();
 const user = express.Router();
+const admin = express.Router();
 const userCred = express.Router();
 
 //Set up serving the front end code
@@ -28,7 +29,8 @@ app.use('/', express.static('../frontend/build'));
   */
 
 router.use(express.json());
-user.use(authenticateToken);
+user.use([authenticateToken,checkIfUserIsDisabled]);
+admin.use(checkIfUserIsAdmin);
 
 //add routes for users that are logged in
 addLoggedInRoutes(user);
@@ -39,11 +41,16 @@ addPublicRoutes(playlists, search, router);
 //add routes for authentication
 addAuthentication(userCred);
 
+//add routes for admin
+addAdminRoutes(admin);
+
+
 app.use('/api', router);
 app.use('/api/playlists', playlists);
 app.use('/api/search', search);
 app.use('/api/account/loggedin', user);
 app.use('/api/account', userCred);
+app.use('/api/account/loggedin/admin', admin);
 
 startDatabaseConnection().then(async () => {
   app.listen(port, () => {
@@ -67,4 +74,21 @@ function authenticateToken(req, res, next) {
     next();
   })
 
+}
+function checkIfUserIsAdmin(req, res, next) {
+  if(req.user.admin !== 1) return res.status(403).json({error : "You need to be an admin to access this operation."});
+
+  next();
+}
+
+async function checkIfUserIsDisabled(req, res, next) {
+  let queryUser = await query("SELECT * FROM user WHERE email='"+req.user.email+"' LIMIT 1;");
+  if(queryUser.error !== undefined) return res.status(500).send();
+  
+  if(queryUser.result.length == 0) return res.status(400).json({error : 'Cannot find user'});
+  queryUser = queryUser.result[0];
+
+  if(queryUser.disabled) return res.status(403).json({error : "account is currently disabled, please contact administrators."});
+
+  next();
 }

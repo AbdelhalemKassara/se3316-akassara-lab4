@@ -189,3 +189,4 @@ function checkPasswordFormat(req, res, next) {
 
   next();
 }
+

@@ -9,6 +9,9 @@ function addAuthentication(userCred) {
   //this creates a user
   userCred.post('/createAccount',checkLoginFormat,checkEmailFormat, checkUserNameFormat, async (req, res) => {
     let user = req.body;
+
+    //check if the user is trying to set their name as administrator (in case one isn't created yet)
+    if(user.userName === 'administrator') return res.status(400).json({error : "You can't set your username as 'administrator'."});
     //check if the user already exists
     let queryUser = await query("SELECT * FROM user WHERE email='" + req.body.email + "' LIMIT 1;");
     if(queryUser.error !== undefined && queryUser.result === undefined) return res.status(500).send();
@@ -124,6 +127,16 @@ function addAuthentication(userCred) {
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
       if(err) return res.sendStatus(403);
 
+      //check if user is disabled
+      let queryUser = await query("SELECT * FROM user WHERE email='"+user.email+"' LIMIT 1;");
+      if(queryUser.error !== undefined) return res.status(500).send();
+      
+      if(queryUser.result.length == 0) return res.status(400).json({error : 'Cannot find user'});
+      queryUser = queryUser.result[0];
+
+      if(queryUser.disabled) return res.status(403).json({error : "account is currently disabled, please contact administrators."});
+
+
       let result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ user.jti + "') AS bool;");
       if(result.result[0].bool == 1) return res.sendStatus(403)//check if we have the token
     
@@ -135,6 +148,7 @@ function addAuthentication(userCred) {
 
 
 exports.addAuthentication = addAuthentication;
+
 
 function checkLoginFormat(req, res, next) {
   let user = req.body;
@@ -160,7 +174,7 @@ function checkEmailFormat(req, res, next) {
   if(!email.includes('@')) return res.status(400).json({error : "this email doesn't contain a @ symbol"});
   if(email.split('@')[0].length === 0) return res.status(400).json({error : "this email doesn't contain a prefix"});
   if(email.includes('..') || !(/.\../.test(email.split('@')[1]))) return res.status(400).json({error : "this email doesn't contain a valid domian"}); //checks if there are two dots next to eachother and if the email's dots have text on either side
-  if(emal.length > 320) return res.status(400).json({error : "This email is too long."});
+  if(email.length > 320) return res.status(400).json({error : "This email is too long."});
   
   next();
 }

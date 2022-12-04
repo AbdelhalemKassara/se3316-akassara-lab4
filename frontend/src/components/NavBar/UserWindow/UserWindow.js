@@ -18,7 +18,7 @@ export default function UserWindow(props) {
   if(props.userName) {//if user is logged in
     if(displayMenu) {
       return (<>
-        <Link className="Nav-Bar-Item" id="User" onClick={toggleState}>{props.userName}</Link>
+        <Link className={props.isAdmin ? 'Nav-Bar-Item admin' : 'Nav-Bar-Item'} id="User" onClick={toggleState}>{props.userName}</Link>
             <div id="user-window"> 
             <Link to='/loggedin/changepassword' onClick={toggleState}>Change Password</Link>
             <Link to='/loggedin/playlists' onClick={toggleState}>Playlists</Link>
@@ -27,7 +27,7 @@ export default function UserWindow(props) {
           </>
         )
     } else {
-      return (<Link className="Nav-Bar-Item" id="User" onClick={toggleState}>{props.userName}</Link>);
+      return (<Link className={props.isAdmin ? 'Nav-Bar-Item admin' : 'Nav-Bar-Item'} id="User" onClick={toggleState}>{props.userName}</Link>);
     }
   } else {
     return (<Link to='/account/login' className="Nav-Bar-Item" id="User">Log In</Link>);

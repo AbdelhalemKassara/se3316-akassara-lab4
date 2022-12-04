@@ -1,0 +1,3 @@
+.users-grid {
+  grid-template-columns: 80px 100px 1fr 1fr 1fr;
+}

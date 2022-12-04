@@ -11,6 +11,8 @@ ALTER TABLE playlistReview ADD COLUMN disabled BOOLEAN DEFAULT 0;
 
 ##testing stuff
 SELECT * FROM user;
+UPDATE user SET admin=1 WHERE id=73;
+
 SELECT EXISTS (SELECT * FROM playlistTrack WHERE playlistID=14) AS 'exists';
 SELECT * FROM track;
 INSERT INTO playlistTrack (playlistID, trackID) VALUES (10, 274);
@@ -18,7 +20,7 @@ SELECT * FROM playlist WHERE id=18;
 SELECT Count(*) FROM playlistReview;
 #users 69, 70, 71
 #playlists 3,4,7,9
-
+SELECT id, verifiedEmail, disabled, userName, admin FROM user;
 
 INSERT INTO playlistReview (userID, playlistID, rating, review) VALUES (69, 9, 7, 'This is a review of user id 69 the playlist 9 and it isnot very good with the id 4 or something and by user with id 69. here is some extra text sad;lfjads;klksdf;ajfd;sdaffdasafds');
 

@@ -14,6 +14,7 @@ import jwtDecode from 'jwt-decode';
 import TrackInfo from './components/TrackInfo/TrackInfo';
 import Search from './components/Search/Search';
 import EditPlaylist from './components/loggedIn/UserPlaylists/EditPlaylist/EditPlaylist';
+import ViewUsers from './components/Admin/ViewUsers/ViewUsers';
 
 function App() {
   const [publicPlaylists, setPublicPlaylists] = useState([]);
@@ -101,7 +102,7 @@ function App() {
   
   return (
     <>
-      <NavBar userName={user.userName} onLogout={logOutUser}/>
+      <NavBar userName={user.userName} onLogout={logOutUser} isAdmin={user.admin == 1}/>
       <div id="main-content">
         <Routes>
           <Route path="/" element={<Home publicPlaylists={publicPlaylists}/>} />
@@ -123,7 +124,8 @@ function App() {
             <Route path="playlistReview" element={<PlaylistReview />} />
           </Route>
   
-          <Route path='/admin'>
+          <Route path='/admin' element={user.admin === 1 ? <Outlet /> : <Home publicPlaylists={publicPlaylists}/>}>
+            <Route path='view/users' element={<ViewUsers />}/>
 
           </Route>
           <Route path="*" element={<p>404 Not Found</p>} />
