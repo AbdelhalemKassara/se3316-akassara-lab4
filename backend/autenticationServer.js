@@ -97,7 +97,7 @@ function addAuthentication(userCred) {
       //check if the tokens have already been added to the database
       let result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ user.jti + "') AS bool;");
       if(result.error !== undefined) return res.status(500).send();
-      if(result.result[0].bool == 1) return res.sendStatus(403)//if the token was already "logged out"
+      if(result && result.result && result.result[0] && result.result[0].bool == 1) return res.sendStatus(403);//if the token was already "logged out"
 
       //add the token to the expired tokens table
       result = await query("INSERT INTO expiredJWT (jti) VALUES ('" + user.jti + "');");
