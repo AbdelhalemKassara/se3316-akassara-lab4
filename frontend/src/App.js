@@ -107,7 +107,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home publicPlaylists={publicPlaylists}/>} />
 
-          <Route path="/account">
+          <Route path="/account" element={!user.id?<Outlet /> : <Home publicPlaylists={publicPlaylists}/>}>
             <Route path="login" element={<LogIn onLogin={loginUser}/> } />
             <Route path="signup" element={<SignUp /> } />
           </Route>
@@ -126,8 +126,8 @@ function App() {
   
           <Route path='/admin' element={user.admin === 1 ? <Outlet /> : <Home publicPlaylists={publicPlaylists}/>}>
             <Route path='view/users' element={<ViewUsers />}/>
-
           </Route>
+
           <Route path="*" element={<p>404 Not Found</p>} />
         </Routes>
       </div>
