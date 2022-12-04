@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import React, { useEffect, useState, useRef } from 'react'
+import { json, Link, useParams } from 'react-router-dom'
 import { fetchWrapper } from '../queryBackend';
 import TrackRow from '../TrackRow/TrackRow';
 import './Playlist.css';
@@ -17,6 +17,10 @@ export default function Playlist(props) {
   const [rating, setRating] = useState(0);
   const [dateLastChanged, setDateLastChanged] = useState();
   const [playlistID, setPlaylistID] = useState();
+
+  const inputRating = useRef();
+  const inputReview = useRef();
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -51,6 +55,24 @@ export default function Playlist(props) {
     }
   }, [props.playlists]);
 
+  async function sendReview() {
+    let {result, body} = await fetchWrapper('/api/account/loggedin/playlist/review/' + id, {
+      method : 'PUT',
+      headers : {
+        "Content-Type" : 'application/json'
+      },
+      body : JSON.stringify({
+        review : inputReview.current.value,
+        rating : inputRating.current.value
+      })
+    });
+
+    if(result.ok) {
+      window.location.reload();
+    } else {
+      alert(body && body.error ? body.error : "There was an issue with adding your review.");
+    }
+  }
   return (<>
     <div className="playlist-info">
       <button onClick={() => navigate(-1)}>Go Back</button>
@@ -77,6 +99,27 @@ export default function Playlist(props) {
       albumName={track.albumName}
       header={false} canEdit={false}/>))}
     </div>
+    <br/>
+    {props.loggedIn && !props.canEdit?
+    <>
+      <div className="add-review-row">
+        <button onClick={() => sendReview()}>Add Review</button>
+        <textarea type="text" ref={inputReview}/>
+        <select ref={inputRating}>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        </select>
+      </div>
+    </>
+     : ''}
     <br/>
     <PlaylistReviews id={playlistID} canEdit={props.canEdit} loggedIn={props.loggedIn}/>
   </>)

@@ -125,6 +125,25 @@ function addLoggedInRoutes(user) {
    
     return res.sendStatus(201);
   });
+
+  user.put('/playlist/review/:id',checkPlaylistAndUserNotMatch, async (req, res) => {
+    const playlistID = req.params.id;
+    const userID = req.user.id;
+    const {review, rating} = req.body;
+
+    if(isNaN(rating) && (rating < 0 || rating > 10)) return res.status(400).json({error : "Please enter a number for the rating that is from 0 to 10."});
+    if(typeof review !== 'string' && !(review instanceof String)) return res.status(400).json({error : "Please enter the review as astring."});
+
+    //check if user already reviewd a playlist
+    let result = await query(`SELECT EXISTS(SELECT * FROM playlistReview WHERE playlistID=${playlistID} AND userID=${userID}) AS 'exists';`);
+    if(result.error !== undefined) {console.log(result.error);return res.sendStatus(500)};
+    if(result && result.result && result.result[0].exists === 1) return res.status(400).json({error : "You have already created a review on this playlist."});
+
+    let {error} = await query(`INSERT INTO playlistReview (playlistID, userID, review, rating) VALUES (?)`, [playlistID, userID, review, rating]);
+    if(error !== undefined) {console.log(error); return res.sendStatus(500)};
+
+    return res.sendStatus(201);
+  });
 }
 
 /*
@@ -141,7 +160,19 @@ function addLoggedInRoutes(user) {
   },
 */
 exports.addLoggedInRoutes = addLoggedInRoutes;
+async function checkPlaylistAndUserNotMatch(req, res, next) {
+  let id = req.params.id;
 
+  if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
+
+  let result = await query(`SELECT userID FROM playlist WHERE id=${req.params.id}`);
+  if(result.error !== undefined) return res.sendStatus(500);
+  if(!result.result || !result.result[0] || !result.result[0].userID) return res.status(400).json({error : "This playlist doesn't exit"})
+  if(result.result[0].userID === req.user.id) return res.status(403).send({error : "You can't create a review on a playlist you created."});
+
+
+  next();
+}
 async function checkPlaylistAndUserMatch(req, res, next) {
   let id = req.params.id;
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { fetchWrapper } from '../../../queryBackend';
 import './EditPlaylist.css';
 import TrackRow from '../../../TrackRow/TrackRow';
@@ -99,7 +99,7 @@ export default function CreatePlaylist(props) {
   return (<>
     <div className="edit-top-buttons">
       <button onClick={() => updatePlaylist()}>Save</button>
-      <button>Cancel</button>
+      <Link to='/loggedin/playlists'><button>Cancel</button></Link>
     </div>
     <br/><br/>
     <div>

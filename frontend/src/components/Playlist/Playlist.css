@@ -34,3 +34,13 @@
   border-width: 1px;
   
 }
+
+.add-review-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.add-review-row > textarea {
+  flex: 1;
+}
