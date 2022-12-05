@@ -75,8 +75,10 @@ function authenticateToken(req, res, next) {
   })
 
 }
-function checkIfUserIsAdmin(req, res, next) {
-  if(req.user.admin !== 1) return res.status(403).json({error : "You need to be an admin to access this operation."});
+async function checkIfUserIsAdmin(req, res, next) {
+  let {result, error} = await query(`SELECT admin FROM user WHERE id=${req.user.id}`);
+  if(error !== undefined) return res.sendStatus(500);
+  if(!result || !result[0] || result[0].admin === 0) return res.status(403).json({error : "You need to be an admin to access this operation."});
 
   next();
 }
