@@ -9,12 +9,15 @@ ALTER TABLE user ADD COLUMN admin BOOLEAN DEFAULT 0;
 
 ALTER TABLE playlistReview ADD COLUMN disabled BOOLEAN DEFAULT 0;
 
+
+ALTER TABLE playlistReview ADD COLUMN creationDate DATETIME(2);
+ALTER TABLE playlistReview MODIFY COLUMN creationDate DATETIME(2) NOT NULL;
+
+
 ##testing stuff
-SELECT * FROM user;
-UPDATE user SET admin=1 WHERE id=73;
 
-SELECT * FROM playlistReview;
 
+## testing/writing longer sql commands
 SELECT reviewList.*, user.userName FROM (SELECT playlistReview.*, playlist.name FROM playlistReview JOIN playlist ON playlist.id=playlistReview.playlistID) AS reviewList JOIN user ON user.id=reviewList.userID;
 SELECT reviewList.*, user.userName FROM 
         (SELECT playlistReview.*, playlist.name FROM playlistReview 

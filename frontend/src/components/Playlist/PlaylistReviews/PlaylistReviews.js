@@ -20,13 +20,15 @@ export default function PlaylistReviews(props) {
     }
     if(!isNaN(props.id)) fetchData();
   }, [props.id])
+
   return (<>
   <div className="review-table">
     <div className='table-lable'><p>Rating</p></div>
     <div className='table-lable'><p>Review</p></div>
-    <div className='table-lable-ed'><p>User</p></div>
+    <div className='table-lable'><p>User</p></div>
+    <div className='table-lable-ed'><p>Creation Date</p></div>
     {reviews.map((review) => (<PlaylistReview key={review.reviewID}
-    rating={review.rating} review={review.review} userName={review.userName}/>))}
+    rating={review.rating} review={review.review} userName={review.userName} creationDate={review.creationDate}/>))}
   </div>
   </>)
 }

@@ -133,3 +133,13 @@ CREATE TABLE expiredRefreshJWT(
 jti VARCHAR(32) NOT NULL,
 PRIMARY KEY(jti));
 ALTER TABLE expiredRefreshJWT RENAME expiredJWT;
+
+
+
+## new stuff
+CREATE TABLE Documents(
+id INT AUTO_INCREMENT,
+name VARCHAR(1000) NOT NULL,
+document MEDIUMTEXT,
+PRIMARY KEY(id));
+

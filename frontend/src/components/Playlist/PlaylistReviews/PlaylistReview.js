@@ -5,5 +5,6 @@ export default function PlaylistReview(props) {
   <div className="data-lable-st"><p>{props.rating}</p></div>
   <div className="data-lable"><p>{props.review}</p></div>
   <div className="data-lable"><p>{props.userName}</p></div>
+  <div className="data-lable"><p>{new Date(props.creationDate).toLocaleString()}</p></div>
   </>);
 }

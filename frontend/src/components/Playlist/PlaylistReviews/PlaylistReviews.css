@@ -1,6 +1,6 @@
 .review-table {
   display: grid;
-  grid-template-columns:  1.5fr 20fr 3fr;
+  grid-template-columns:  1.5fr 20fr 3fr 3fr;
 }
 
 .table-lable, .table-lable-ed {

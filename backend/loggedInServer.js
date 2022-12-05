@@ -88,8 +88,14 @@ function addLoggedInRoutes(user) {
   });
 
   user.delete('/playlist/delete/:id',checkPlaylistAndUserMatch, async (req, res) => {
-    let result = await query(`DELETE FROM playlist WHERE id=${req.params.id};`);
-    if(result.error !== undefined) return res.sendStatus(500);  
+    let result = await query(`DELETE FROM playlistTrack WHERE playlistID=${req.params.id};`);
+    if(result.error !== undefined) {console.log(result.error); return res.sendStatus(500);};  
+
+    result = await query(`DELETE FROM playlistReview WHERE playlistID=${req.params.id};`);
+    if(result.error !== undefined) {console.log(result.error); return res.sendStatus(500);};  
+
+    result = await query(`DELETE FROM playlist WHERE id=${req.params.id};`);
+    if(result.error !== undefined) {console.log(result.error); return res.sendStatus(500);};  
 
     return res.sendStatus(200);
   });
@@ -145,7 +151,7 @@ function addLoggedInRoutes(user) {
     if(result.error !== undefined) {console.log(result.error);return res.sendStatus(500)};
     if(result && result.result && result.result[0].exists === 1) return res.status(400).json({error : "You have already created a review on this playlist."});
 
-    let {error} = await query(`INSERT INTO playlistReview (playlistID, userID, review, rating) VALUES (?)`, [playlistID, userID, review, rating]);
+    let {error} = await query(`INSERT INTO playlistReview (playlistID, userID, review, rating, creationDate) VALUES (?)`, [playlistID, userID, review, rating, CurSQLDate()]);
     if(error !== undefined) {console.log(error); return res.sendStatus(500)};
 
     return res.sendStatus(201);
