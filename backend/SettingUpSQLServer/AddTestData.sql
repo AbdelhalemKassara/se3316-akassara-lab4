@@ -13,6 +13,13 @@ ALTER TABLE playlistReview ADD COLUMN disabled BOOLEAN DEFAULT 0;
 SELECT * FROM user;
 UPDATE user SET admin=1 WHERE id=73;
 
+SELECT * FROM playlistReview;
+
+SELECT reviewList.*, user.userName FROM (SELECT playlistReview.*, playlist.name FROM playlistReview JOIN playlist ON playlist.id=playlistReview.playlistID) AS reviewList JOIN user ON user.id=reviewList.userID;
+SELECT reviewList.*, user.userName FROM 
+        (SELECT playlistReview.*, playlist.name FROM playlistReview 
+          JOIN playlist ON playlist.id=playlistReview.playlistID) AS reviewList 
+          JOIN user ON user.id=reviewList.userID WHERE user.userName LIKE '%ratings%';
 SELECT EXISTS (SELECT * FROM playlistTrack WHERE playlistID=14) AS 'exists';
 SELECT * FROM track;
 INSERT INTO playlistTrack (playlistID, trackID) VALUES (10, 274);

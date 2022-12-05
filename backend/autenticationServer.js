@@ -144,6 +144,7 @@ function addAuthentication(userCred) {
       return res.json({accessToken : accessToken});
     })
   })
+
 }
 
 

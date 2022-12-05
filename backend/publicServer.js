@@ -179,7 +179,7 @@ function addPublicRoutes(playlists, search, router) {
     if(result.result.length == 0) return res.status(404).json({error : "This playlist doesn't exist."});
     if(result.result[0].publicVisibility == 0) return res.status(403).json({error : "This playlist is private."});
 
-    result = await query("SELECT playlistReview.*, user.userName FROM playlistReview JOIN user ON user.id=playlistReview.userID WHERE playlistID=" + id + ";");
+    result = await query("SELECT playlistReview.*, user.userName FROM playlistReview JOIN user ON user.id=playlistReview.userID WHERE playlistID=" + id + " AND playlistReview.disabled=0;");
     if(result.error !== undefined) return res.sendStatus(500);
     
     return res.status(200).json(result.result);

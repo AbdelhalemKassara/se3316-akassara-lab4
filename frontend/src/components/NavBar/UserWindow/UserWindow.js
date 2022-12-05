@@ -22,6 +22,7 @@ export default function UserWindow(props) {
             <div id="user-window"> 
             <Link to='/loggedin/changepassword' onClick={toggleState}>Change Password</Link>
             <Link to='/admin/view/users' onClick={toggleState}>View Users</Link>
+            <Link to='/admin/view/reviews' onClick={toggleState}>View Reviews</Link>
             <Link to='/loggedin/playlists' onClick={toggleState}>Playlists</Link>
             <Link onClick={() => {props.onLogout()}}>Log out</Link>
             </div>

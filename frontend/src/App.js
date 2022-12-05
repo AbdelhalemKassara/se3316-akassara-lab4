@@ -15,6 +15,7 @@ import TrackInfo from './components/TrackInfo/TrackInfo';
 import Search from './components/Search/Search';
 import EditPlaylist from './components/loggedIn/UserPlaylists/EditPlaylist/EditPlaylist';
 import ViewUsers from './components/Admin/ViewUsers/ViewUsers';
+import ViewReviews from './components/Admin/ViewReviews/ViewReviews';
 
 function App() {
   const [publicPlaylists, setPublicPlaylists] = useState([]);
@@ -126,6 +127,7 @@ function App() {
   
           <Route path='/admin' element={user.admin === 1 ? <Outlet /> : <Home publicPlaylists={publicPlaylists}/>}>
             <Route path='view/users' element={<ViewUsers />}/>
+            <Route path='view/reviews' element={<ViewReviews />}/>
           </Route>
 
           <Route path="*" element={<p>404 Not Found</p>} />

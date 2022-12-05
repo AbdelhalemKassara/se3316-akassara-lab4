@@ -35,7 +35,47 @@ function addAdminRoutes(admin) {
     if(error !== undefined) return res.sendStatus(500);
 
     return res.sendStatus(200);
-  })
+  });
+
+  admin.put('/review/setdisable', async (req, res) => {
+    let {reviewID, disabled} = req.body;
+    if(isNaN(reviewID)) return res.status(400).json({error : "Please enter a valid number for the review id."});
+    if(disabled !== 0 && disabled !== 1) return res.status(400).json({error : "Please enter either 0 or 1 for disabled."});
+
+    //check if review exists
+    let result = await query(`SELECT EXISTS (SELECT * FROM playlistReview WHERE reviewID=${reviewID}) AS 'exists';`);
+    if(result.error) {console.log(result.error); return res.sendStatus(500);}
+    if(!(result.result && result.result[0] && result.result[0].exists == 1)) return res.send(400).json({error : "Please enter an review id that exists."});
+
+    //disable the review
+    result = await query(`UPDATE playlistReview SET disabled=${disabled} WHERE reviewID=${reviewID}`);
+    if(result.error) {console.log(result.error);return res.sendStatus(500);}
+
+    return res.sendStatus(200);
+   });
+
+   admin.get('/reviews', async (req, res) => {
+    if(req.query === undefined || req.query.userName === undefined) return res.status(400).json({error : "Please add a username to the query."})
+      let userName = req.query.userName;
+      if(typeof userName !== 'string' && !(userName instanceof String)) return res.send(400).json({error : "Please enter a string as the username"})
+
+      let result;
+      if(userName.length == 0) {
+        result = await query(`SELECT reviewList.*, user.userName FROM 
+        (SELECT playlistReview.*, playlist.name FROM playlistReview 
+          JOIN playlist ON playlist.id=playlistReview.playlistID) AS reviewList 
+          JOIN user ON user.id=reviewList.userID;`);
+      } else {
+        result = await query(`SELECT reviewList.*, user.userName FROM 
+        (SELECT playlistReview.*, playlist.name FROM playlistReview 
+          JOIN playlist ON playlist.id=playlistReview.playlistID) AS reviewList 
+          JOIN user ON user.id=reviewList.userID WHERE user.userName LIKE '%${userName}%';`);
+      }
+      
+      if(result.error !== undefined) return res.sendStatus(500);
+
+      return res.json(result.result);
+   });
 }
 
 async function getMainAdminID(req, res, next) {

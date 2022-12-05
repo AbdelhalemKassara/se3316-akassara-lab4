@@ -1,0 +1,13 @@
+.search-reviews-bar {
+  display: flex;
+  flex-direction: row;
+}
+
+.search-reviews-bar input {
+  flex: 1;
+}
+
+.view-reviews-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
