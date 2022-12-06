@@ -9,6 +9,7 @@ export default function Home(props) {
     async function fetchAboutMessage() {
       let {body : about} = await fetchWrapper('/api/about');
       let message = await about;
+
       setAboutMessage(message.message);
     }
     fetchAboutMessage();

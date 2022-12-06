@@ -1,4 +1,6 @@
 const { query } = require('./databaseConnection');
+const AcceptableUsePolicy = require('./Documents/AcceptableUsePolicy.json');
+const fs = require('fs');
 
 function addAdminRoutes(admin) {
 
@@ -76,8 +78,21 @@ function addAdminRoutes(admin) {
 
       return res.json(result.result);
    });
+
+   admin.put('/documents/acceptableusepolicy', (req, res) => {
+      AcceptableUsePolicy.file = req.body.file;
+
+      saveFile('./Documents/AcceptableUsePolicy.json', AcceptableUsePolicy);
+   });
+
 }
 
+function saveFile(path, doc) {
+  fs.writeFile(path, JSON.stringify(doc), function writeJSON(err) {
+    if(err) return console.log(err);
+    console.log("saved " + path);
+  });
+}
 async function getMainAdminID(req, res, next) {
   let {result, error} = await query(`SELECT id FROM user WHERE userName='administrator';`);
   if(error !== undefined) console.log(error);

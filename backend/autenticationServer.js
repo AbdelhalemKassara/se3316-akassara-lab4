@@ -125,7 +125,7 @@ function addAuthentication(userCred) {
     
 
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
-      if(err) return res.sendStatus(403);
+      if(err) return res.sendStatus(401);
 
       //check if user is disabled
       let queryUser = await query("SELECT * FROM user WHERE email='"+user.email+"' LIMIT 1;");
