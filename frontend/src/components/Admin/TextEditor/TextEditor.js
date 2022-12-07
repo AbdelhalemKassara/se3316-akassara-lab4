@@ -21,20 +21,16 @@ import React from 'react';
 import {convertToRaw, convertFromRaw, Editor, EditorState, getDefaultKeyBinding, RichUtils} from 'draft-js';
 import './TextEditor.css';
 import 'draft-js/dist/Draft.css';
+import { fetchWrapper } from '../../queryBackend';
 
 
 export default class TextEditor extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {readOnly : true};
 
     //add data from local storage
-    const content = window.localStorage.getItem('content');
-    if(content) {
-      this.state = {editorState: EditorState.createWithContent(convertFromRaw(JSON.parse(content)))};
-    } else {
-      this.state = {editorState: EditorState.createEmpty()};
-    }
+    this.state = {editorState : EditorState.createEmpty()};
+
     this.editor = React.createRef();
 
     this.onChange = (editorState) => this.setState({editorState});
@@ -86,13 +82,40 @@ export default class TextEditor extends React.Component {
       )
     );
   }
+
+  componentDidMount() {
+    this.getFile();
+  }
+  async getFile() {
+    let {result, body} = await fetchWrapper('/api/account/loggedin/admin/documents/acceptableusepolicy');
+
+    console.log(body.file);
+    if(result.ok) {
+      this.setState({editorState: EditorState.createWithContent(convertFromRaw(body.file))});
+    } else {
+      alert('There was an issue getting the file');
+    }
+  }
   //this is something i added
-  saveFile() {
+  async saveFile() {
     //use this code in a different function to save data locally so that if the user reloads they don't lose their data
     //move it to the onchange method
-    const contentState = this.state.editorState.getCurrentContent();
-    window.localStorage.setItem('content', JSON.stringify(convertToRaw(contentState)));
-    console.log(JSON.stringify(convertToRaw(contentState)).length);
+
+    let {result, body}= await fetchWrapper('/api/account/loggedin/admin/documents/acceptableusepolicy', {
+      method : 'PUT',
+      headers : {
+        'Content-Type' : 'application/json'
+      },
+      body : JSON.stringify({
+        file : convertToRaw(this.state.editorState.getCurrentContent())
+      })
+    });
+
+    if(result.ok) {
+      alert('File has been saved');
+    } else {
+      alert(body && body.error ? body.error : "There was an issue when updating the file.");
+    }
   }
 
   render() {
@@ -109,7 +132,7 @@ export default class TextEditor extends React.Component {
     }
 
     return (<>
-      <button onClick={() => {this.saveFile();}}>Save</button>
+      <button onClick={() => {return this.saveFile();}}>Save</button>
       <div className="RichEditor-root">
         <BlockStyleControls
           editorState={editorState}

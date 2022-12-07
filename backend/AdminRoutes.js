@@ -83,8 +83,13 @@ function addAdminRoutes(admin) {
       AcceptableUsePolicy.file = req.body.file;
 
       saveFile('./Documents/AcceptableUsePolicy.json', AcceptableUsePolicy);
+
+      res.sendStatus(200);
    });
 
+   admin.get('/documents/acceptableusepolicy', (req, res) => {
+    res.json(AcceptableUsePolicy);
+   })
 }
 
 function saveFile(path, doc) {
