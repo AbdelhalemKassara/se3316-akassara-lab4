@@ -152,12 +152,38 @@ function addAdminRoutes(admin) {
     let reqID = req.params.id;
 
     let {error} = await query(`UPDATE DMCARequest SET active=0 WHERE id=${reqID};`);
-    if(error !== undefined) {console.log(error); return res.sendStatus(500);}
+    if(error !== undefined) return res.sendStatus(500);
 
     res.sendStatus(200);
   });
-}
 
+  admin.get('/dmcatakedown/activerequests', async (req, res) => {
+    let {result, error} = await query(`SELECT DMCARequest.*, DMCAReviews.reviewID FROM DMCARequest Left Join DMCAReviews ON DMCARequest.id=DMCAReviews.DMCARequestID WHERE active=1;`);
+    if(error !== undefined) return res.sendStatus(500);
+
+    return res.status(200).json(compressRequests(result));
+  });
+  admin.get('/dmcatakedown/disactivatedrequests', async (req, res) => {
+    let {result, error} = await query(`SELECT DMCARequest.*, DMCAReviews.reviewID FROM DMCARequest LEFT JOIN DMCAReviews ON DMCARequest.id=DMCAReviews.DMCARequestID WHERE active=0;`);
+    if(error !== undefined) return res.sendStatus(500);
+
+    return res.status(200).json(compressRequests(result));
+
+  })
+}
+function compressRequests(result) {
+  let out = new Map();
+    result.forEach(val => {
+      if(out.has(val.id)) {
+        out.get(val.id).reviews.push(val.reviewID);
+
+      } else {
+        out.set(val.id, {...val, reviews : [val.reviewID]});
+      }
+    });
+
+    return Array.from(out.values());
+}
 async function validateRequest(req, res, next) {
   if(isNaN(req.params.id)) return res.status(400).json({error : "Please enter the request as a number."});
 
@@ -171,12 +197,12 @@ async function validateRequest(req, res, next) {
 function validateDateTimeNote(req, res, next) {
   let vals = req.body;
   if(vals === null || vals === undefined) return res.status(400).json({error : "The body is undefined or null."});
-  
+
   if(isNaN(vals.year)) return res.status(400).json({error : "Please enter the year as a number"});
-  if(isNaN(vals.month)) return res.status(400).json({error : "Please enter the year as a number"});
-  if(isNaN(vals.day)) return res.status(400).json({error : "Please enter the year as a number"});
-  if(isNaN(vals.hour)) return res.status(400).json({error : "Please enter the year as a number"});
-  if(isNaN(vals.minute)) return res.status(400).json({error : "Please enter the year as a number"});
+  if(isNaN(vals.month)) return res.status(400).json({error : "Please enter the month as a number"});
+  if(isNaN(vals.day)) return res.status(400).json({error : "Please enter the day as a number"});
+  if(isNaN(vals.hour)) return res.status(400).json({error : "Please enter the hour as a number"});
+  if(isNaN(vals.minute)) return res.status(400).json({error : "Please enter the minute as a number"});
 
   if(vals.year < 1901 || vals.year > 2155) return res.status(400).json({error : "Please enter a year between 1901 and 2155"});
   if(vals.month < 1 || vals.month > 12) return res.status(400).json({error : "Please enter a month value from 1 to 12"});

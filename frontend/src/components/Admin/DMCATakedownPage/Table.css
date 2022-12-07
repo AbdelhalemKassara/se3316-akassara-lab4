@@ -1,0 +1,23 @@
+.table {
+  display: grid;
+}
+
+.row {
+  margin: 0;
+  padding: 0;
+  border-style: none solid  solid none;
+  border-width: 1px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.header {
+  margin: 0;
+  padding: 0;
+  border-style: none solid none none;
+  border-width: 1px;
+  display: flex;
+  justify-content: space-around;
+
+  background-color: rgb(199, 199, 199);
+}
