@@ -191,7 +191,7 @@ function addPublicRoutes(playlists, search, router) {
   router.get('/documents/acceptableusepolicy', (req, res) => {
     res.json(AcceptableUsePolicy);
   });
-  router.get('/documents/DMCAPolicy', (req, res) => {
+  router.get('/documents/dmcapolicy', (req, res) => {
     res.json(DMCAPolicy);
   });
 

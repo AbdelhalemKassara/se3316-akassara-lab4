@@ -27,6 +27,7 @@ export default function UserWindow(props) {
                 <Link to='/admin/edit/securityandprivacypolicy' onClick={toggleState}>Edit Security and Privacy Policy</Link>
                 <Link to='/admin/edit/dmcapolicy' onClick={toggleState}>Edit DMCA Policy</Link>
                 <Link to='/admin/edit/acceptableusepolicy' onClick={toggleState}>Edit Acceptable Use Policy</Link>
+                <Link to='/admin/dmcatakedown' onClick={toggleState}>DMCA Takedown</Link>
               </>)
               :
               <></>

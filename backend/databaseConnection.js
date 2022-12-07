@@ -29,13 +29,16 @@ function startDatabaseConnection() {
     })
   }).catch((err) => {
     console.log(err);
-    return err;
+    process.exit();
   });
 }
 function UTCtoSQLDate(val) {
   return moment(new Date(0).setUTCSeconds(val)).format('YYYY-MM-DD HH:mm:ss');
 }
+function DateToSQLDate(date) {
+  return moment(date).format('YYYY-MM-DD HH:mm:ss');
 
+}
 function CurSQLDate() {
   return moment().format('YYYY-MM-DD HH:mm:ss');
 }
@@ -44,3 +47,4 @@ exports.UTCtoSQLDate = UTCtoSQLDate;
 exports.query = query;
 exports.startDatabaseConnection = startDatabaseConnection;
 exports.CurSQLDate = CurSQLDate;
+exports.DateToSQLDate = DateToSQLDate;

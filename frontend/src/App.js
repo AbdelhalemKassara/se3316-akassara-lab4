@@ -18,6 +18,7 @@ import ViewUsers from './components/Admin/ViewUsers/ViewUsers';
 import ViewReviews from './components/Admin/ViewReviews/ViewReviews';
 import TextEditor from './components/Admin/TextEditor/TextEditor';
 import TextViewer from './components/Admin/TextEditor/TextViewer';
+import DMCATakedownPage from './components/Admin/DMCATakedownPage/DMCATakedownPage';
 
 function App() {
   const [publicPlaylists, setPublicPlaylists] = useState([]);
@@ -134,6 +135,7 @@ function App() {
           <Route path='/admin' element={user.admin === 1 ? <Outlet /> : <Home publicPlaylists={publicPlaylists}/>}>
             <Route path='view/users' element={<ViewUsers />}/>
             <Route path='view/reviews' element={<ViewReviews />}/>
+            <Route path='dmcatakedown' element={<DMCATakedownPage />}/>
             <Route path='edit/securityandprivacypolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/securityandprivacypolicy' getPath='/api/documents/securityandprivacypolicy' title='Security and Privacy Policy'/>} />
             <Route path='edit/acceptableusepolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/acceptableusepolicy' getPath='/api/documents/acceptableusepolicy' title='Acceptable Use Policy'/>} />
             <Route path='edit/dmcapolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/dmcapolicy' getPath='/api/documents/dmcapolicy' title='DMCA Policy'/>} />

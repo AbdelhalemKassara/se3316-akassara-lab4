@@ -58,7 +58,6 @@ startDatabaseConnection().then(async () => {
   });
   
 })
-
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];//undefined or token
