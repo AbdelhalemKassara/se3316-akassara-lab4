@@ -21,21 +21,14 @@
  import {convertFromRaw, Editor, EditorState, getDefaultKeyBinding, RichUtils} from 'draft-js';
  import './TextEditor.css';
  import 'draft-js/dist/Draft.css';
- 
+ import { fetchWrapper } from '../../queryBackend';
  
  export default class TextViewer extends React.Component {
    constructor(props) {
      super(props);
-     this.state = {readOnly : true};
  
-     //add data from local storage   change this so it fetches a file store on the from the server
-     const content = window.localStorage.getItem('content');
-     if(content) {
-       this.state = {editorState: EditorState.createWithContent(convertFromRaw(JSON.parse(content)))};
-     } else {
-       this.state = {editorState: EditorState.createEmpty()};
-     }
-     ////////////////
+     this.state = {editorState: EditorState.createEmpty()};
+
      
      this.editor = React.createRef();
      
@@ -89,6 +82,18 @@
      );
    }
 
+   componentDidMount() {
+    this.getFile();
+  }
+  async getFile() {
+    let {result, body} = await fetchWrapper(this.props.path);
+
+    if(result.ok) {
+      this.setState({editorState: EditorState.createWithContent(convertFromRaw(body.file))});
+    } else {
+      alert('There was an issue getting the file');
+    }
+  }
    render() {
      const {editorState} = this.state;
  

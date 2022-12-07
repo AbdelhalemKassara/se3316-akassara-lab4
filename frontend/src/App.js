@@ -17,6 +17,7 @@ import EditPlaylist from './components/loggedIn/UserPlaylists/EditPlaylist/EditP
 import ViewUsers from './components/Admin/ViewUsers/ViewUsers';
 import ViewReviews from './components/Admin/ViewReviews/ViewReviews';
 import TextEditor from './components/Admin/TextEditor/TextEditor';
+import TextViewer from './components/Admin/TextEditor/TextViewer';
 
 function App() {
   const [publicPlaylists, setPublicPlaylists] = useState([]);
@@ -108,7 +109,11 @@ function App() {
       <div id="main-content">
         <Routes>
           <Route path="/" element={<Home publicPlaylists={publicPlaylists}/>} />
-
+          <Route path='/documents'>
+            <Route path='securityandprivacypolicy' element={<TextViewer path='/api/documents/securityandprivacypolicy'/>}/>
+            <Route path='acceptableusepolicy' element={<TextViewer path='/api/documents/acceptableusepolicy'/>}/>
+            <Route path='dmcapolicy' element={<TextViewer path='/api/documents/dmcapolicy'/>}/>
+          </Route>
           <Route path="/account" element={!user.id?<Outlet /> : <Home publicPlaylists={publicPlaylists}/>}>
             <Route path="login" element={<LogIn onLogin={loginUser}/> } />
             <Route path="signup" element={<SignUp /> } />
@@ -129,7 +134,9 @@ function App() {
           <Route path='/admin' element={user.admin === 1 ? <Outlet /> : <Home publicPlaylists={publicPlaylists}/>}>
             <Route path='view/users' element={<ViewUsers />}/>
             <Route path='view/reviews' element={<ViewReviews />}/>
-            <Route path='edit/securityandprivacypolicy' element={<TextEditor/>} />
+            <Route path='edit/securityandprivacypolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/securityandprivacypolicy' getPath='/api/documents/securityandprivacypolicy' title='Security and Privacy Policy'/>} />
+            <Route path='edit/acceptableusepolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/acceptableusepolicy' getPath='/api/documents/acceptableusepolicy' title='Acceptable Use Policy'/>} />
+            <Route path='edit/dmcapolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/dmcapolicy' getPath='/api/documents/dmcapolicy' title='DMCA Policy'/>} />
           </Route>
 
           <Route path="*" element={<p>404 Not Found</p>} />

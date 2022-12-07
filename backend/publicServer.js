@@ -2,6 +2,9 @@ const {query, startDatabaseConnection, UTCtoSQLDate, CurSQLDate} = require('./da
 const aboutMessage = require('./aboutMessage.json');
 const stringSimilarity = require('string-similarity');
 const mysql = require('mysql2');
+const AcceptableUsePolicy = require('./Documents/AcceptableUsePolicy.json');
+const DMCAPolicy = require('./Documents/DMCAPolicy.json');
+const SecurityAndPrivacyPolicy = require('./Documents/securityAndPrivacyPolicy.json');
 
 function addPublicRoutes(playlists, search, router) {
     //*Get (retrieve)
@@ -183,6 +186,17 @@ function addPublicRoutes(playlists, search, router) {
     if(result.error !== undefined) return res.sendStatus(500);
     
     return res.status(200).json(result.result);
+  })
+
+  router.get('/documents/acceptableusepolicy', (req, res) => {
+    res.json(AcceptableUsePolicy);
+  });
+  router.get('/documents/DMCAPolicy', (req, res) => {
+    res.json(DMCAPolicy);
+  });
+
+  router.get('/documents/securityandprivacypolicy', (req, res) => {
+    res.json(SecurityAndPrivacyPolicy);
   })
   router.get('/artist/:id', (req, res) => {
   });

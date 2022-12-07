@@ -24,6 +24,9 @@ export default function UserWindow(props) {
             {props.isAdmin ?(<>
                 <Link to='/admin/view/users' onClick={toggleState}>View Users</Link>
                 <Link to='/admin/view/reviews' onClick={toggleState}>View Reviews</Link>
+                <Link to='/admin/edit/securityandprivacypolicy' onClick={toggleState}>Edit Security and Privacy Policy</Link>
+                <Link to='/admin/edit/dmcapolicy' onClick={toggleState}>Edit DMCA Policy</Link>
+                <Link to='/admin/edit/acceptableusepolicy' onClick={toggleState}>Edit Acceptable Use Policy</Link>
               </>)
               :
               <></>

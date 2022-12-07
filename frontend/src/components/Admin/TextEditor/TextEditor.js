@@ -29,8 +29,7 @@ export default class TextEditor extends React.Component {
     super(props);
 
     //add data from local storage
-    this.state = {editorState : EditorState.createEmpty()};
-
+    this.state = {editorState : EditorState.createEmpty(), prevTitle : this.props.title};
     this.editor = React.createRef();
 
     this.onChange = (editorState) => this.setState({editorState});
@@ -86,10 +85,14 @@ export default class TextEditor extends React.Component {
   componentDidMount() {
     this.getFile();
   }
+  componentDidUpdate(prevProps) {
+    if(prevProps.title !== this.props.title) {
+      this.getFile();
+    }
+  }
   async getFile() {
-    let {result, body} = await fetchWrapper('/api/account/loggedin/admin/documents/acceptableusepolicy');
+    let {result, body} = await fetchWrapper(this.props.getPath);
 
-    console.log(body.file);
     if(result.ok) {
       this.setState({editorState: EditorState.createWithContent(convertFromRaw(body.file))});
     } else {
@@ -101,7 +104,7 @@ export default class TextEditor extends React.Component {
     //use this code in a different function to save data locally so that if the user reloads they don't lose their data
     //move it to the onchange method
 
-    let {result, body}= await fetchWrapper('/api/account/loggedin/admin/documents/acceptableusepolicy', {
+    let {result, body}= await fetchWrapper(this.props.filePath, {
       method : 'PUT',
       headers : {
         'Content-Type' : 'application/json'
@@ -132,6 +135,8 @@ export default class TextEditor extends React.Component {
     }
 
     return (<>
+    <br/><br/>
+    <h1>{this.props.title}</h1>
       <button onClick={() => {return this.saveFile();}}>Save</button>
       <div className="RichEditor-root">
         <BlockStyleControls
@@ -150,7 +155,7 @@ export default class TextEditor extends React.Component {
             handleKeyCommand={this.handleKeyCommand}
             keyBindingFn={this.mapKeyToEditorCommand}
             onChange={this.onChange}
-            placeholder="asdfasd"
+            placeholder=""
             ref={this.editor}
             spellCheck={true}
             readOnly={false}

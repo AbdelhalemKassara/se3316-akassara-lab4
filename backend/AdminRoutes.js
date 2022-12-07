@@ -1,5 +1,8 @@
 const { query } = require('./databaseConnection');
 const AcceptableUsePolicy = require('./Documents/AcceptableUsePolicy.json');
+const DMCAPolicy = require('./Documents/DMCAPolicy.json');
+const SecurityAndPrivacyPolicy = require('./Documents/securityAndPrivacyPolicy.json');
+
 const fs = require('fs');
 
 function addAdminRoutes(admin) {
@@ -81,15 +84,24 @@ function addAdminRoutes(admin) {
 
    admin.put('/documents/acceptableusepolicy', (req, res) => {
       AcceptableUsePolicy.file = req.body.file;
-
       saveFile('./Documents/AcceptableUsePolicy.json', AcceptableUsePolicy);
 
       res.sendStatus(200);
    });
 
-   admin.get('/documents/acceptableusepolicy', (req, res) => {
-    res.json(AcceptableUsePolicy);
-   })
+   admin.put('/documents/dmcapolicy', (req, res) => {
+      DMCAPolicy.file = req.body.file;
+      saveFile('./Documents/DMCAPolicy.json', DMCAPolicy);
+
+      res.sendStatus(200);
+   });
+
+   admin.put('/documents/securityandprivacypolicy', (req, res) => {
+    SecurityAndPrivacyPolicy.file = req.body.file;
+    saveFile('./Documents/securityAndPrivacyPolicy.json', SecurityAndPrivacyPolicy);
+
+    res.sendStatus(200);
+   });
 }
 
 function saveFile(path, doc) {

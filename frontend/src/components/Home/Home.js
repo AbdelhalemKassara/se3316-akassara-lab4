@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import { Link } from 'react-router-dom';
 import PlaylistIcon from '../PlaylistIcon/PlaylistIcon';
 import {fetchWrapper} from '../queryBackend';
 
@@ -26,6 +27,12 @@ export default function Home(props) {
     dateLastChanged={list.dateLastChanged} user={list.userName}
     url={'/playlist/'}/>))}
   </div>
+  <br/><br/><br/>
+  <Link to='/documents/securityandprivacypolicy'>Security And Privacy Policy</Link>
+  <br/>
+  <Link to='/documents/acceptableusepolicy'>Acceptable Use Policy</Link>
+  <br/>
+  <Link to='/documents/dmcapolicy'>DMCA Policy</Link>
   </>);
 }
 
