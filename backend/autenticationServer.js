@@ -66,7 +66,7 @@ function addAuthentication(userCred) {
     try {
       if(await bcrypt.compare(req.body.password, user.password)) {
         //check if the user is disabled or if they haven't verified their email yet
-        if(user.disabled) return res.status(403).json({error : "account is currently disabled, please contact administrators."});
+        if(user.disabled) return res.status(403).json({error : "account is currently disabled, please contact administrators at akassara@uwo.ca."});
         if(!user.verifiedEmail) return res.status(403).json({verificationLink : req.protocol + "://" + req.get('host') + '/api/account/verification/' + await generateAccountVerificationToken(user)});
         
         //the user exists
