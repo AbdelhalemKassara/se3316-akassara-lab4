@@ -13,6 +13,7 @@ export default function TrackInfo() {
   const [duration, setDuration] = useState('');
   const [number, setNumber] = useState('');
   const [title, setTitle] = useState('');
+  const [genres, setGenres] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -26,6 +27,7 @@ export default function TrackInfo() {
         setDuration(body.duration);
         setNumber(body.number);
         setTitle(body.title);
+        setGenres(body.genres);
       } else {
         alert(body? body.error : "There was an issue with getting this track.");
       }
@@ -43,6 +45,7 @@ export default function TrackInfo() {
   <p>Duration: {duration}</p>
   <p>Track Number: {number}</p>
   <p>Track Title: {title}</p>
+  <p>Genres: {genres.toString()}</p>
   <br/>
   <button onClick={() => navigate(-1)}>Go Back</button>
   </>)
