@@ -57,12 +57,26 @@ function addPublicRoutes(playlists, search, router) {
     let id = req.params.id;
     if(isNaN(id)) return res.status(400).json({error : "Please enter a number"});
 
-    let track = await query('SELECT * FROM track WHERE id=' + id);
+    let track = await query(`SELECT tgs.id, albumID, artistID, licenseTitle, bitRate, composer, copyrightC,copyrightP, dateCreated, dateRecorded,
+    discNumber, duration, explicit, languageCode,  number, publisher, tgs.title, artistName, albumName, genre.title AS genre FROM (SELECT * FROM track 
+    JOIN trackGenres AS tg 
+    ON track.id=tg.trackID WHERE id=${id}) AS tgs
+    JOIN genre ON genre.id=tgs.genreID;`);//110576
     if(track.error !== undefined) return res.sendStatus(500);
 
     if(track.result.length === 0) return res.status(404).json({error : "This track id doesn't exist"});
-    
-    return res.json(track.result[0]);
+
+    let out = new Map();
+      track.result.forEach(val => {
+        if(out.has(val.id)) {
+          out.get(val.id).genres.push(val.genre);
+  
+        } else {
+          out.set(val.id, {...val, genres : [val.genre]});
+        }
+      });
+
+      return res.json(Array.from(out.values())[0]);
     
   });
   

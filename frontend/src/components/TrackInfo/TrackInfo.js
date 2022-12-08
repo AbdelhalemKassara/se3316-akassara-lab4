@@ -18,6 +18,7 @@ export default function TrackInfo() {
     async function fetchData() {
       let {result, body} = await fetchWrapper("/api/track/" + id);
       if(result.ok) {
+        console.log(body.id);
         setAlbumTitle(body.albumName);
         setArtist(body.artistName);
         setDateRecorded(body.dateRecorded);
