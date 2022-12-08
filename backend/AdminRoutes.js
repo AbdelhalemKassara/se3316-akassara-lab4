@@ -171,6 +171,20 @@ function addAdminRoutes(admin) {
     return res.status(200).json(compressRequests(result));
 
   });
+  admin.get('/dmcatakedown/notices/:id', validateRequest, async (req, res) => {
+    let reqID = req.params.id;
+    let {result, error} = await query(`SELECT * FROM DMCANotice WHERE DMCARequestID=${reqID};`);
+    if(error !== undefined) return res.sendStatus(500);
+    
+    res.json(result);
+  });
+  admin.get('/dmcatakedown/disputes/:id', validateRequest, async (req, res) => {
+    let reqID = req.params.id;
+    let {result, error} = await query(`SELECT * FROM DMCADispute WHERE DMCARequestID=${reqID};`);
+    if(error !== undefined) return res.sendStatus(500);
+
+    res.json(result);
+  })
   admin.get('/documents/dmcatakedown', async(req, res) => {
     return res.json(DMCATakedown);
   });
@@ -188,6 +202,8 @@ function compressRequests(result) {
 
     return Array.from(out.values());
 }
+
+
 async function validateRequest(req, res, next) {
   if(isNaN(req.params.id)) return res.status(400).json({error : "Please enter the request as a number."});
 

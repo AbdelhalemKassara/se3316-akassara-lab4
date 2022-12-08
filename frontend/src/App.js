@@ -19,6 +19,7 @@ import ViewReviews from './components/Admin/ViewReviews/ViewReviews';
 import TextEditor from './components/Admin/TextEditor/TextEditor';
 import TextViewer from './components/Admin/TextEditor/TextViewer';
 import DMCATakedownPage from './components/Admin/DMCATakedownPage/DMCATakedownPage';
+import DMCARequestsInfo from './components/Admin/DMCARequestsInfo/DMCARequestsInfo';
 
 function App() {
   const [publicPlaylists, setPublicPlaylists] = useState([]);
@@ -140,6 +141,7 @@ function App() {
             <Route path='edit/acceptableusepolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/acceptableusepolicy' getPath='/api/documents/acceptableusepolicy' title='Acceptable Use Policy'/>} />
             <Route path='edit/dmcapolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/dmcapolicy' getPath='/api/documents/dmcapolicy' title='DMCA Policy'/>} />
             <Route path='view/dmcatakedown' element={<TextViewer path='/api/account/loggedin/admin/documents/dmcatakedown'/>}/>
+            <Route path='view/request/:id' element={<DMCARequestsInfo />}/>
           </Route>
 
           <Route path="*" element={<p>404 Not Found</p>} />

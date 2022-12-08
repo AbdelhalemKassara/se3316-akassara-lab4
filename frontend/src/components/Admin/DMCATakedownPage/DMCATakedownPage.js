@@ -241,7 +241,7 @@ function generateInputRow(dateRef, timeRef, addFunc, notesRef, idRef) {
 
 function Row({id, active, dateRecived, note, reviews}) {
   return (<>
-  <div className='row'>{id}</div>
+  <div className='row'><Link to={'/admin/view/request/' + id}>{id}</Link></div>
   <div className='row'>{active}</div>
   <div className='row'>{dateRecived}</div>
   <div className='row'>{note}</div>
