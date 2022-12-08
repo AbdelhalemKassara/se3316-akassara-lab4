@@ -88,21 +88,21 @@ function addPublicRoutes(playlists, search, router) {
     let ratedGenres;
     if(searchTerms.track.length > 1 && /\S/.test(searchTerms.track)) {//check if there are characters other than white space
       let trackTitles = await query("SELECT DISTINCT title AS trackTitle FROM track;");
-      if(trackTitles.error !== undefined) return res.sendStatus(500);
+      if(trackTitles.error !== undefined) { console.log('trackTitles.error'); return res.sendStatus(500);}
 
       ratedTracks = stringSimilarity.findBestMatch(searchTerms.track, trackTitles.result.map(val => val.trackTitle));
     }
 
     if(searchTerms.artist.length > 1 && /\S/.test(searchTerms.artist)) {
       let artistNames = await query("SELECT DISTINCT artistName FROM track;");
-      if(artistNames.error !== undefined) return res.sendStatus(500);
+      if(artistNames.error !== undefined) { console.log('trackTitles.error'); return res.sendStatus(500);}
 
       ratedArtists = stringSimilarity.findBestMatch(searchTerms.artist, artistNames.result.map(val => val.artistName))
     }
 
     if(searchTerms.genre.length > 1 && /\S/.test(searchTerms.genre)) {
       let genres = await query("SELECT DISTINCT title AS genre FROM genre;");
-      if(genres.error !== undefined) return res.sendStatus(500);
+      if(genres.error !== undefined) { console.log('trackTitles.error'); return res.sendStatus(500);}
       
       ratedGenres = stringSimilarity.findBestMatch(searchTerms.genre, genres.result.map(val => val.genre))
     }
@@ -118,10 +118,14 @@ function addPublicRoutes(playlists, search, router) {
     let result = {};
     if(searchTerms.artist === "" && searchTerms.track === "" && searchTerms.genre === "") {
       result = await query("SELECT * FROM track LIMIT 100;");
-    }  else {
+    } else if(!(ratedArtistsStr !== "" || ratedTracksStr !== "" || ratedGenresStr !== "")) {
+      //if there is noting to get
+      result.result = [];
+    }  
+    else {
       result = await query(formQueryStr(ratedArtistsStr, ratedTracksStr, ratedGenresStr, searchTerms.artist, searchTerms.track, searchTerms.genre));
     }
-    if(result.error !== undefined) return res.sendStatus(500);
+    if(result.error !== undefined) { console.log(result.error);return res.sendStatus(500);}
 
     //there are multiple rows in the result.result object that are the same except for the genre, this combines them
     let out = new Map();
