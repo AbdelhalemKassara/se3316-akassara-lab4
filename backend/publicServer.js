@@ -104,11 +104,8 @@ function addPublicRoutes(playlists, search, router) {
     let result = {};
     if(searchTerms.artist === "" && searchTerms.track === "" && searchTerms.genre === "") {
       result = await query("SELECT * FROM track LIMIT 100;");
-    } else if(ratedArtistsStr !== "" || ratedTracksStr !== "" || ratedGenresStr !== ""){ 
-      //add another condition for single letters and a WHERE statement (currently single letters aren't accepted)
-      result = await query(formQueryStr(ratedArtistsStr, ratedTracksStr, ratedGenresStr));
-    } else {
-      return res.status(400).json({error : "Please enter more than one letter"})
+    }  else {
+      result = await query(formQueryStr(ratedArtistsStr, ratedTracksStr, ratedGenresStr, searchTerms.artist, searchTerms.track, searchTerms.genre));
     }
     if(result.error !== undefined) return res.sendStatus(500);
 
@@ -131,12 +128,13 @@ function addPublicRoutes(playlists, search, router) {
       
       return 0;
     }
-    function formQueryStr(artists, tracks, genres) {
+    function formQueryStr(artists, tracks, genres, slAartists, slTracks, slGenres) {
       let queryStr = `SELECT t.id, t.albumID, t.artistID, t.licenseTitle, t.bitRate, t.composer, t.copyrightC, t.copyrightP, t.dateCreated, 
       t.dateRecorded, t.discNumber, t.duration, t.number, t.publisher, t.title, t.artistName, t.albumName, genre.title AS genre 
       FROM (SELECT track.*, trackGenres.genreID FROM track JOIN trackGenres ON track.id=trackGenres.trackID) AS t JOIN genre ON genre.id =t.genreID
       WHERE`;
 
+      //add terms that closely match
       queryStr += artists !== "" ? " t.artistName IN " + artists : artists;
 
       queryStr += queryStr.charAt(queryStr.length-1) === ')' && tracks !== "" ? " AND" : "";
@@ -145,12 +143,33 @@ function addPublicRoutes(playlists, search, router) {
       queryStr += queryStr.charAt(queryStr.length-1) === ')' && genres !== "" ? " AND" : "";
       queryStr += genres !== "" ? " genre.title IN " + genres : genres;
 
-      queryStr += " ORDER BY ";
-      queryStr += tracks !== "" ? " field(t.title, " + tracks.slice(1, tracks.length) + ", " : "";
-      queryStr += artists !== "" ? " field(t.artistName, " + artists.slice(1, artists.length) + ", " : "";
-      queryStr += genres !== "" ? " field(genre.title, " + genres.slice(1, genres.length) + ", " : "";
+      //add single letters
+      if(slAartists !== undefined && slAartists.length === 1) {
+        queryStr += queryStr.charAt(queryStr.length-1) === ')' && slAartists !== "" ? " AND" : "";
+        queryStr += slAartists !== "" ? ` t.artistName LIKE '${slAartists}%'` : slAartists;  
+      }
+      if(slTracks !== undefined && slTracks.length === 1) {
+        console.log(queryStr.charAt(queryStr.length-1));
+        queryStr += (queryStr.charAt(queryStr.length-1) === ')' || queryStr.charAt(queryStr.length-1) === "'") && slTracks !== "" ? " AND" : "";
+        queryStr += slTracks !== "" ? ` t.title LIKE '${slTracks}%'` : slTracks;  
+      }
+      if(slGenres !== undefined && slGenres.length === 1) {
+        queryStr += (queryStr.charAt(queryStr.length-1) === ')' || queryStr.charAt(queryStr.length-1) === "'") && slGenres !== "" ? " AND" : "";
+        queryStr += slGenres !== "" ? ` t.title LIKE '${slGenres}%'` : slGenres;  
+      }
 
-      queryStr = queryStr.slice(0, queryStr.length-2);//remove last comma
+
+      //add sorting
+      if(artists !== '' || tracks !== '' || genres !== '') {
+        queryStr += " ORDER BY ";
+        queryStr += tracks !== "" ? " field(t.title, " + tracks.slice(1, tracks.length) + ", " : "";
+        queryStr += artists !== "" ? " field(t.artistName, " + artists.slice(1, artists.length) + ", " : "";
+        queryStr += genres !== "" ? " field(genre.title, " + genres.slice(1, genres.length) + ", " : "";
+  
+        queryStr = queryStr.slice(0, queryStr.length-2);//remove last comma
+      }
+     
+
       queryStr += " LIMIT 100;";
       return queryStr;
     }
