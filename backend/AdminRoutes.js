@@ -2,6 +2,7 @@ const { query, DateToSQLDate } = require('./databaseConnection');
 const AcceptableUsePolicy = require('./Documents/AcceptableUsePolicy.json');
 const DMCAPolicy = require('./Documents/DMCAPolicy.json');
 const SecurityAndPrivacyPolicy = require('./Documents/securityAndPrivacyPolicy.json');
+const DMCATakedown = require('./Documents/DMCATakedown.json');
 
 const fs = require('fs');
 
@@ -169,7 +170,10 @@ function addAdminRoutes(admin) {
 
     return res.status(200).json(compressRequests(result));
 
-  })
+  });
+  admin.get('/documents/dmcatakedown', async(req, res) => {
+    return res.json(DMCATakedown);
+  });
 }
 function compressRequests(result) {
   let out = new Map();

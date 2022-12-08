@@ -139,6 +139,7 @@ function App() {
             <Route path='edit/securityandprivacypolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/securityandprivacypolicy' getPath='/api/documents/securityandprivacypolicy' title='Security and Privacy Policy'/>} />
             <Route path='edit/acceptableusepolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/acceptableusepolicy' getPath='/api/documents/acceptableusepolicy' title='Acceptable Use Policy'/>} />
             <Route path='edit/dmcapolicy' element={<TextEditor filePath='/api/account/loggedin/admin/documents/dmcapolicy' getPath='/api/documents/dmcapolicy' title='DMCA Policy'/>} />
+            <Route path='view/dmcatakedown' element={<TextViewer path='/api/account/loggedin/admin/documents/dmcatakedown'/>}/>
           </Route>
 
           <Route path="*" element={<p>404 Not Found</p>} />

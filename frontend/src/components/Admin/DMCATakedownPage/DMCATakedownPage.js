@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom';
 import {fetchWrapper} from '../../queryBackend';
 
 import './DMCATakedownPage.css';
@@ -173,6 +174,7 @@ export default function DMCATakedownPage() {
   
 
   return (<>
+  <Link to='/admin/view/dmcatakedown'>DMCA Takedown Explanation Document</Link>
   <h2>Log Request</h2>
   <div className='input-review-ids'>
     <p>Review IDS: {reviewIDs.map(id => id + ', ')}</p>
