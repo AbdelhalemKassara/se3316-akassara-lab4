@@ -31,6 +31,7 @@ export default function DMCARequestsInfo() {
     getData();
   },[])
   
+  console.log(notices);
   return (<>
   <h1>Notices</h1>
   <div className="table" style={{gridTemplateColumns: '1fr 1fr 1fr'}}>
@@ -52,10 +53,10 @@ export default function DMCARequestsInfo() {
   </>)
 }
 
-function Row({id, dateRecived, note}) {
+function Row({id, dateRecived, note, dateSent}) {
   return(<>
   <div className='row'>{id}</div>
-  <div className='row'>{dateRecived}</div>
+  <div className='row'>{new Date(dateRecived || dateSent).toLocaleString()}</div>
   <div className='row'>{note}</div>
   </>)
 }

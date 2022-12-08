@@ -243,7 +243,7 @@ function Row({id, active, dateRecived, note, reviews}) {
   return (<>
   <div className='row'><Link to={'/admin/view/request/' + id}>{id}</Link></div>
   <div className='row'>{active}</div>
-  <div className='row'>{dateRecived}</div>
+  <div className='row'>{new Date(dateRecived).toLocaleString()}</div>
   <div className='row'>{note}</div>
   <div className='row'>{reviews.toString()}</div>
   </>)
