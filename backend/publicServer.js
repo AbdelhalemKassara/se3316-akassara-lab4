@@ -198,29 +198,6 @@ function addPublicRoutes(playlists, search, router) {
   router.get('/documents/securityandprivacypolicy', (req, res) => {
     res.json(SecurityAndPrivacyPolicy);
   })
-  router.get('/artist/:id', (req, res) => {
-  });
-  router.get('/album/:id', (req, res) => {
-  });
-  //given a name it will return a list of tracks and albums ids that match or an error message
-  search.get('/track/:name', (req, res) => {
-  });
-  //given an artist name it will return a list of artists ids or an error message
-  search.get('/artist/:name', (req, res) => {
-  });
-
-
-  //given a playlist id and set of tracks it will replace the tracks with the new ones or return an error message
-  playlists.put('/updateList/:id', (req, res) => {
-  });
-
-  //given a playlist id it will create a new playlist or return an error message
-  playlists.put('/newList/:id', (req, res) => {
-  });
-
-  //*Delete (delete)
-  playlists.delete('/removeList/:id', (req, res) => {
-  });
 }
 
 function verifySearchInput(req, res, next) {
