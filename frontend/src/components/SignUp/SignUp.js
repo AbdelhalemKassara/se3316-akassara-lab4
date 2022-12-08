@@ -26,12 +26,15 @@ export default function SignUp() {
         password : password.current.value
       })
     })
-
-    if(result.ok && window.confirm('this will take you to verify your account.')) {
+    if(result.ok) {
+      alert(body.verificationLink);
+      if(window.confirm('this will take you to verify your account.')) {
         window.location.href = body.verificationLink;
     } else if(result.status === 400 && body.error) {
       alert(body.error);
     }
+    }
+    
   }
 
   return (

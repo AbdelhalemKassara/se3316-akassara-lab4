@@ -73,6 +73,7 @@ function App() {
       setUser(jwtDecode(localStorage.getItem('refreshToken')));
     } else {
       result = await result.json();
+      alert(result.verificationLink);
       if(result.verificationLink && window.confirm('this will take you to verify your account.')) {
         window.location.href = result.verificationLink;
       } else {
