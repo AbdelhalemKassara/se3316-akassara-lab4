@@ -90,21 +90,21 @@ function addPublicRoutes(playlists, search, router) {
       let trackTitles = await query("SELECT DISTINCT title AS trackTitle FROM track;");
       if(trackTitles.error !== undefined) { console.log('trackTitles.error'); return res.sendStatus(500);}
 
-      ratedTracks = stringSimilarity.findBestMatch(searchTerms.track, trackTitles.result.map(val => val.trackTitle));
+      ratedTracks = stringSimilarity.findBestMatch(searchTerms.track.toLowerCase(), trackTitles.result.map(val => val.trackTitle.toLowerCase()));
     }
 
     if(searchTerms.artist.length > 1 && /\S/.test(searchTerms.artist)) {
       let artistNames = await query("SELECT DISTINCT artistName FROM track;");
       if(artistNames.error !== undefined) { console.log('trackTitles.error'); return res.sendStatus(500);}
 
-      ratedArtists = stringSimilarity.findBestMatch(searchTerms.artist, artistNames.result.map(val => val.artistName))
+      ratedArtists = stringSimilarity.findBestMatch(searchTerms.artist.toLowerCase(), artistNames.result.map(val => val.artistName.toLowerCase()))
     }
 
     if(searchTerms.genre.length > 1 && /\S/.test(searchTerms.genre)) {
       let genres = await query("SELECT DISTINCT title AS genre FROM genre;");
       if(genres.error !== undefined) { console.log('trackTitles.error'); return res.sendStatus(500);}
       
-      ratedGenres = stringSimilarity.findBestMatch(searchTerms.genre, genres.result.map(val => val.genre))
+      ratedGenres = stringSimilarity.findBestMatch(searchTerms.genre.toLowerCase(), genres.result.map(val => val.genre.toLowerCase()))
     }
 
     let ratedGenresStr = "";
