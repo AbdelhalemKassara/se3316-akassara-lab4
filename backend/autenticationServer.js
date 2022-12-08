@@ -190,23 +190,23 @@ function checkUserNameFormat(req, res, next) {
 }
  
 async function generateAccessToken(user) {
-  return await generateToken(process.env.ACCESS_TOKEN_SECRET, '15min', user);
+  return await generateToken(process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TIME, user);
 }
 
 async function generateAccountVerificationToken(user) {
-  return await generateToken(process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET, '15min', user);
+  return await generateToken(process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET, process.env.VERIFICATION_TIME, user);
 }
 
 async function generateRefreshToken(user) {
-  return await generateToken(process.env.REFRESH_TOKEN_SECRET, '24h', user);
+  return await generateToken(process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TIME, user);
 }
 
 async function generateToken(SECRET, expiration, user) {
-  let id = crypto.randomBytes(16).toString('hex');
+  let id = crypto.randomBytes(Number(process.env.ID_LEN)).toString('hex');
   let result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ id + "') AS bool;");
 
   while(result.result[0].bool == 1) {
-    id = crypto.randomBytes(16).toString('hex');
+    id = crypto.randomBytes(Number(process.env.ID_LEN)).toString('hex');
     result = await query("SELECT EXISTS (SELECT * FROM expiredJWT WHERE jti='"+ id + "') AS bool;");  
   }
   let userDetails = {id : user.id, email : user.email, userName : user.userName, admin : user.admin};

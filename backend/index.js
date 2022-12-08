@@ -8,7 +8,7 @@ const {addLoggedInRoutes} = require('./loggedInServer');
 const {addPublicRoutes} = require('./publicServer');
 const {addAdminRoutes} = require('./AdminRoutes');
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
 const router = express.Router();
 const playlists = express.Router();
@@ -19,14 +19,6 @@ const userCred = express.Router();
 
 //Set up serving the front end code
 app.use('/', express.static('../frontend/build'));
-
-/*app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    next();
-  });
-  */
 
 router.use(express.json());
 user.use([authenticateToken,checkIfUserIsDisabled]);
@@ -65,7 +57,7 @@ function authenticateToken(req, res, next) {
   if(token == null) return res.sendStatus(401);
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if(err) return res.status(401).json({accessLevel : 'logged in user'});//token is invalid
+    if(err) return res.status(401).json({accessLevel : 'invalid'});//token is invalid
 
     //the token is valid
 
